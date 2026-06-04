@@ -2,23 +2,23 @@
 
 ## Recommendation
 
-Keep `runOneUserTurn()` as a compatibility wrapper, even after introducing a richer event stream.
+Keep `runOneUserTurn()` as a compatibility wrapper, even after introducing the richer session, command, and event APIs.
 
 ## Why This Matters
 
-The current API is useful for tests, scripts, and the minimal CLI. Removing it too early forces every caller to understand events immediately.
+The current API is useful for tests, scripts, and the minimal CLI. Removing it too early forces every caller to understand sessions, commands, and events immediately.
 
 The richer API should power serious interfaces. The simple API should remain as a convenience.
 
 ## Guideline
 
-Implement the lower-level event API first, then make `runOneUserTurn()` consume it internally and return the final assistant text.
+Implement the lower-level session API first, then make `runOneUserTurn()` consume it internally and return the final assistant text.
 
 That keeps one source of truth for behavior. The wrapper should not duplicate model/tool loop logic.
 
 ## What To Do Next
 
-Define what "final text" means in the event model. Then make the wrapper collect that final event and return it.
+Define what "final text" means in the event model. Then make the wrapper create or use an `AgentSession`, dispatch a `user_message` command, collect the final event, and return its text.
 
 Keep the wrapper boring. It should not render progress, approve tools, or know about Ink or React.
 
@@ -28,6 +28,7 @@ Keep the wrapper boring. It should not render progress, approve tools, or know a
 - Should it return only assistant text, or also metadata later?
 - Should it be named `runOneUserTurn`, or should the event API make that name feel obsolete?
 - How will tests assert that the wrapper and stream agree?
+- Should the wrapper reject turns that require approval, auto-deny them, or require an approval policy option?
 
 ## UI Notes
 

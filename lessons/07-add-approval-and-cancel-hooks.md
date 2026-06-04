@@ -12,9 +12,20 @@ Approval is not just a safety feature. It is also an interaction model: the user
 
 ## Guideline
 
-The agent should request a decision. The UI should provide the decision.
+The agent should request a decision by emitting an event. The UI should provide the decision by dispatching a command to the session.
 
 Avoid hardcoding approval prompts into the agent. Emit an event that describes the requested action, then let the CLI, Ink TUI, or GUI decide how to ask the user.
+
+The command path should be the same for every adapter:
+
+```ts
+type AgentCommand =
+  | { type: "approve_tool_call"; turnId: string; callId: string }
+  | { type: "deny_tool_call"; turnId: string; callId: string; reason?: string }
+  | { type: "cancel_turn"; turnId: string };
+```
+
+For an in-process TUI, these commands go directly to `session.dispatch(command)`. For the GUI, the browser sends the command to the local server, and the server dispatches it to the matching session.
 
 ## What To Do Next
 
@@ -25,7 +36,16 @@ Start by classifying tools:
 - requires approval
 - never allowed in the current mode
 
-Then design the smallest approval API that can block a tool call until the UI responds.
+Then design the smallest command API that can block a tool call until the UI responds and can cancel a running turn.
+
+The flow should look like this:
+
+```txt
+adapter -> dispatch user_message -> session -> agent
+agent -> emits approval.requested -> session -> adapter
+adapter -> dispatch approve_tool_call or deny_tool_call -> session
+session -> resolves pending approval -> agent continues
+```
 
 ## Design Questions
 
@@ -33,6 +53,8 @@ Then design the smallest approval API that can block a tool call until the UI re
 - Should approvals be per call, per turn, or rememberable by pattern?
 - Should the user be able to edit tool arguments before approval?
 - What should the agent tell the model when a user denies a tool call?
+- What should happen if the user cancels while a tool process is running?
+- How should the server reject commands for unknown sessions, finished turns, or stale `callId` values?
 
 ## UI Notes
 

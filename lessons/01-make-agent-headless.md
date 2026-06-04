@@ -12,28 +12,34 @@ If those concepts enter the agent package, every new UI becomes harder to build.
 
 ## Guideline
 
-Think of the agent as an execution engine with a small public contract:
+Think of the agent as an execution engine behind a stateful session API. The core agent has a small public contract:
 
-- accept user input
+- accept normalized commands from a session
 - call the model
 - run tools
-- maintain conversation state
+- maintain model/tool state needed for the conversation
 - report what happened
 
 Do not make the agent render anything. It should report facts and decisions. The UI decides how those facts look.
 
 ## Driving A Headless Agent
 
-Emitting events makes the agent observable, but events are only the output side of the contract.
+Emitting events makes the agent observable, but events are only the output side of the contract. Adapters also need a command path into the running session.
 
-The UI still drives the agent by sending input into it. For the CLI, that can be as simple as reading one prompt from stdin and passing it into a turn runner:
+The UI should drive an `AgentSession`, not random agent internals. For the CLI, that can still be as simple as reading one prompt from stdin and dispatching a user-message command:
 
 ```ts
+const events = session.events();
+
 while (true) {
   const userInput = await rl.question("> ");
+  session.dispatch({ type: "user_message", text: userInput });
 
-  for await (const event of agent.runTurn({ text: userInput })) {
+  for await (const event of events) {
     renderCliEvent(event);
+    if (event.type === "turn.completed" || event.type === "turn.failed") {
+      break;
+    }
   }
 }
 ```
@@ -41,25 +47,27 @@ while (true) {
 The relationship should feel like this:
 
 ```txt
-CLI/TUI/GUI -> sends input or commands -> agent
-agent -> emits events -> CLI/TUI/GUI
+CLI/TUI/GUI adapter -> sends commands -> AgentSession -> Agent
+Agent -> emits events -> AgentSession -> CLI/TUI/GUI adapter
 ```
 
 Headless does not mean autonomous. It means the agent does not own stdin, stdout, terminal layout, React state, or browser transport.
 
-For the first version, `runTurn()` can be enough. The caller gives the agent one user message and consumes events until the turn finishes.
+For the first version, `dispatch({ type: "user_message", text })` and `events()` can be enough. The caller gives the session one user message and consumes events until the turn finishes.
 
-Later, some interactions will need a second command path. For example, the agent may emit an approval request before running a shell command. The UI then responds with an approval or denial, and the agent continues.
+Some interactions need commands while a turn is already running. For example, the agent may emit an approval request before running a shell command. The UI then dispatches an approval or denial command, and the agent continues.
 
-Do not solve the full command path immediately. First make the existing CLI work through the same event stream that Ink will eventually consume.
+Do not let every adapter invent its own control API. The CLI, Ink TUI, and GUI server should all send the same `AgentCommand` values to the same session abstraction.
 
 ## What To Do Next
 
 Start by identifying which parts of `main.ts` are UI-only. Readline input, prompt display, and `console.log` output belong outside the core agent.
 
-Then decide what the agent should expose instead of `runOneUserTurn(): Promise<string>`.
+Then introduce the session-level API that the richer adapters will use:
 
-Do not redesign everything yet. The first milestone is simply: the existing CLI still works, but it consumes the same headless API that a future Ink TUI would consume.
+- `session.dispatch(command)` for user messages, approvals, denials, and cancellation
+- `session.events()` or an equivalent subscription API for typed events
+- `session.snapshot()` for current state needed by adapters
 
 ## Design Questions
 
@@ -67,9 +75,9 @@ Do not redesign everything yet. The first milestone is simply: the existing CLI 
 - What state belongs only in a UI?
 - Should one session represent one workspace, one conversation, or one process?
 - How much of the OpenAI response object should leak through the public API?
-- Is `runTurn(input)` enough for now, or do you already need a separate command API?
-- When the agent pauses for approval later, where should that pending state live?
+- Which commands are accepted while a turn is idle versus running?
+- When the agent pauses for approval, where should that pending state live?
 
 ## UI Notes
 
-The Ink TUI can run the agent in-process. The React/Tailwind/shadcn GUI should probably talk to a local Node process instead of importing filesystem and shell-capable code directly into the browser.
+The Ink TUI can run the session and agent in-process. The React/Tailwind/shadcn GUI should talk to a local Node server that owns sessions instead of importing filesystem and shell-capable code directly into the browser.
