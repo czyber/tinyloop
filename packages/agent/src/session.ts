@@ -31,7 +31,7 @@ export class AgentSession {
         this.emit({ type: "turn.started" })
         if (command.type === "user_message") {
             try {
-                const response = await this.agent.runOneUserTurn(command.text);
+                const response = await this.agent.runOneUserTurn(command.text, {emit: (event: AgentEvent) => this.emit(event)});
                 this.emit({ type: "assistant.message", text: response });
                 this.emit({ type: "turn.completed" });
             }

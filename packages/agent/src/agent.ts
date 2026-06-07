@@ -3,6 +3,7 @@ import type { FunctionTool, ResponseFunctionToolCall } from "openai/resources/re
 import { createDefaultTools } from "./tools";
 import { handleToolCall, type ToolMap, type ToolOutput, toolDefinitions } from "./tools/registry";
 import { isToolCall } from "./utils";
+import { AgentEventSink } from "./event";
 
 const DEFAULT_MODEL = "gpt-5.4-mini";
 const DEFAULT_MAX_TOOL_TURNS = 8;
@@ -27,7 +28,7 @@ export class Agent {
     this.previousResponseId = undefined;
   }
 
-  async runOneUserTurn(userInput: string): Promise<string> {
+  async runOneUserTurn(userInput: string, options?: {emit: AgentEventSink}): Promise<string> {
     let turnInput: TurnInput = [{ role: "user", content: userInput }];
 
     for (let turn = 0; turn < this.maxToolTurns; ++turn) {
@@ -45,7 +46,7 @@ export class Agent {
         return response.output_text;
       }
 
-      turnInput = await runToolCalls(this.tools, toolCalls);
+      turnInput = await runToolCalls(this.tools, toolCalls, options);
     }
 
     throw new Error(`Exceeded max tool turns ${this.maxToolTurns}`);
@@ -66,10 +67,11 @@ type UserInput = {
 
 type TurnInput = Array<UserInput | ToolOutput>;
 
-export async function runToolCalls(tools: ToolMap, toolCalls: ResponseFunctionToolCall[]): Promise<ToolOutput[]> {
+export async function runToolCalls(tools: ToolMap, toolCalls: ResponseFunctionToolCall[], options? : {emit: AgentEventSink}): Promise<ToolOutput[]> {
   const toolOutputs: ToolOutput[] = [];
 
   for (const toolCall of toolCalls) {
+    options?.emit({type: "tool.execution.started", name: toolCall.name});
     toolOutputs.push(await handleToolCall(tools, toolCall));
   }
 

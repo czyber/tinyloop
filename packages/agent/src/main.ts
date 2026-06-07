@@ -10,6 +10,9 @@ function renderCliEvent(event: AgentEvent): void {
   if (event.type === 'assistant.message') {
     console.log(`[${event.type}] ${event.text}`);
     return;
+  } else if (event.type === "turn.failed") {
+    console.log(`[${event.type}] ${event.error}`)
+    return;
   }
 
   console.log(`[${event.type}]`);
