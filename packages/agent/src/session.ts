@@ -35,8 +35,8 @@ export class AgentSession {
                 this.emit({ type: "assistant.message", text: response });
                 this.emit({ type: "turn.completed" });
             }
-            catch {
-                this.emit({ type: "turn.failed" }); // Extend this with error details
+            catch (error) {
+                this.emit({ type: "turn.failed", error: error instanceof Error ? error.message : String(error) });
             }
         }
     }
