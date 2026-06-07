@@ -9,14 +9,22 @@ dotenv.config();
 
 function renderCliEvent(event: AgentEvent): void {
   if (event.type === "assistant.message") {
-    console.log(`[${event.type}] ${event.text}`);
+    console.log(`[${event.type}] ${event.turnId}|${event.sequence} - ${event.text}`);
     return;
   } else if (event.type === "turn.failed") {
-    console.log(`[${event.type}] ${event.error}`);
+    console.log(`[${event.type}] ${event.turnId}|${event.sequence} - ${event.error}`);
+    return;
+  } else if (event.type === "tool.execution.started") {
+    console.log(
+      `[${event.type}] ${event.turnId}|${event.sequence} - Tool call ${event.callId} (${event.name}) with ${event.args}`,
+    );
+    return;
+  } else if (event.type === "tool.execution.finished") {
+    console.log(`[${event.type}] ${event.turnId}|${event.sequence} - Tool call ${event.callId} (${event.name})`);
     return;
   }
 
-  console.log(`[${event.type}]`);
+  console.log(`[${event.type}] ${event.turnId}|${event.sequence}`);
 }
 
 export async function mainLoop(): Promise<void> {

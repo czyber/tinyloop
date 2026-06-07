@@ -74,8 +74,18 @@ export async function runToolCalls(
   const toolOutputs: ToolOutput[] = [];
 
   for (const toolCall of toolCalls) {
-    options?.emit({ type: "tool.execution.started", name: toolCall.name });
+    options?.emit({
+      type: "tool.execution.started",
+      name: toolCall.name,
+      callId: toolCall.call_id,
+      args: toolCall.arguments,
+    });
     toolOutputs.push(await handleToolCall(tools, toolCall));
+    options?.emit({
+      type: "tool.execution.finished",
+      name: toolCall.name,
+      callId: toolCall.call_id,
+    });
   }
 
   return toolOutputs;
