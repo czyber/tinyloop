@@ -1,10 +1,20 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { createTwoFilesPatch } from "diff";
-import type { ToolHandler } from "./registry";
+import type { ToolHandler, ToolResult } from "./registry";
+
 import { requiredStringArg, resolveWorkspacePath } from "./registry";
 
-async function writeFileTool(workspaceRoot: string, path: string, content: string): Promise<string> {
+export type WriteFileToolDetails = {
+  path: string;
+  content: string;
+};
+
+async function writeFileTool(
+  workspaceRoot: string,
+  path: string,
+  content: string,
+): Promise<ToolResult<WriteFileToolDetails>> {
   const filePath = resolveWorkspacePath(workspaceRoot, path);
   await mkdir(dirname(filePath), { recursive: true });
 
@@ -20,10 +30,13 @@ async function writeFileTool(workspaceRoot: string, path: string, content: strin
   await writeFile(filePath, content, "utf-8");
 
   if (before === undefined) {
-    return `Created ${filePath}`;
+    return { output: `Created ${filePath}`, details: { path, content } };
   }
 
-  return createTwoFilesPatch(filePath, filePath, before, content, "before", "after");
+  return {
+    output: createTwoFilesPatch(filePath, filePath, before, content, "before", "after"),
+    details: { path, content },
+  };
 }
 
 function isFileNotFoundError(error: unknown): boolean {

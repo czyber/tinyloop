@@ -1,10 +1,20 @@
 import { readFile } from "node:fs/promises";
-import type { ToolHandler } from "./registry";
+import type { ToolHandler, ToolResult } from "./registry";
 import { requiredStringArg, resolveWorkspacePath } from "./registry";
 
-async function readFileTool(workspaceRoot: string, path: string): Promise<string> {
+export type ReadFileToolDetails = {
+  path: string;
+};
+
+async function readFileTool(workspaceRoot: string, path: string): Promise<ToolResult<ReadFileToolDetails>> {
   const filePath = resolveWorkspacePath(workspaceRoot, path);
-  return await readFile(filePath, "utf-8");
+  const result = await readFile(filePath, "utf-8");
+  return {
+    output: result,
+    details: {
+      path,
+    },
+  };
 }
 
 export function createReadFileTool(workspaceRoot: string): ToolHandler {

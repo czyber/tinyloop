@@ -1,12 +1,18 @@
 import { isAbsolute, relative, resolve } from "node:path";
 import type { FunctionTool, ResponseFunctionToolCall } from "openai/resources/responses/responses.mjs";
 
-export type ToolHandler = {
-  definition: FunctionTool;
-  run: (args: ToolArgs) => string | Promise<string>;
+export type ToolArgs = Record<string, unknown>;
+
+export type ToolResult<TDetails = unknown> = {
+  output: string;
+  details?: TDetails;
 };
 
-export type ToolArgs = Record<string, unknown>;
+export type ToolHandler<TDetails = unknown> = {
+  definition: FunctionTool;
+  run: (args: ToolArgs) => ToolResult<TDetails> | Promise<ToolResult<TDetails>>;
+};
+
 export type ToolMap = Record<string, ToolHandler>;
 
 export type ToolOutput = {
@@ -47,11 +53,11 @@ export async function handleToolCall(tools: ToolMap, toolCall: ResponseFunctionT
   }
 
   const args = parseToolArgs(toolCall.arguments);
-  const output = await tool.run(args);
+  const result = await tool.run(args);
   return {
     type: "function_call_output",
     call_id: toolCall.call_id,
-    output,
+    output: result.output,
   };
 }
 

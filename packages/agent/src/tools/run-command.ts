@@ -1,8 +1,22 @@
 import { spawn } from "node:child_process";
-import type { ToolHandler } from "./registry";
+import type { ToolHandler, ToolResult } from "./registry";
 import { requiredStringArg } from "./registry";
 
-export async function runCommandTool(workspaceRoot: string, command: string): Promise<string> {
+export type RunCommandLineToolDetails = {
+  command: string;
+  stdout: string;
+  stderr: string;
+  exitCode?: number | null;
+};
+
+function formatCommandOutput(details: RunCommandLineToolDetails): string {
+  return [`exit_code: ${details.exitCode}`, "stdout:", details.stdout, "stderr:", details.stderr].join("\n");
+}
+
+export async function runCommandTool(
+  workspaceRoot: string,
+  command: string,
+): Promise<ToolResult<RunCommandLineToolDetails>> {
   return await new Promise((resolve, reject) => {
     const childProcess = spawn(command, { cwd: workspaceRoot, shell: true });
     let stdout = "";
@@ -30,7 +44,16 @@ export async function runCommandTool(workspaceRoot: string, command: string): Pr
 
     childProcess.on("close", (exitCode) => {
       clearTimeout(timeout);
-      resolve([`exit_code: ${exitCode}`, "stdout:", stdout.trimEnd(), "stderr:", stderr.trimEnd()].join("\n"));
+      const details: RunCommandLineToolDetails = {
+        command,
+        stdout,
+        stderr,
+        exitCode,
+      };
+      resolve({
+        output: formatCommandOutput(details),
+        details,
+      });
     });
   });
 }
