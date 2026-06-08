@@ -59,11 +59,11 @@ export class AgentSession {
     }
   }
 
-  events(): AsyncGenerator<AgentEventPayload> {
+  events(): AsyncGenerator<AgentEvent> {
     const iterator = on(this.emitter, "event");
     return (async function* () {
       for await (const [event] of iterator) {
-        yield event as AgentEventPayload;
+        yield event as AgentEvent;
       }
     })();
   }
