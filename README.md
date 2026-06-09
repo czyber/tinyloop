@@ -1,37 +1,16 @@
 # tinyloop
 
-tinyloop is a minimal starting point for a tool-using coding agent.
+tinyloop is a tiny coding agent, I originally create to learn about how to build such a system in a pragmatic way.
 
-It is intentionally small:
+It is by design minimalistic and not a production ready agent. While I plan to implement advanced features and eventually grow it into a small, usable agent - it will replace existing coding agents s.a. Pi, Codex or Claude Code.
 
-- the repo is a pnpm workspace
-- the agent lives in `packages/agent`
-- the agent loop calls the model, runs tool calls, then sends tool outputs back
-- the default tool set has `read_file`, `write_file`, `edit_file`, and `run_command`
+The goal for this project is to create something usable, which is a great starting point to learn about agent intrinsics.
 
-## Setup
+## Packages
 
-```sh
-pnpm install
-cp .env.example .env
-```
+- `packages/agent` contains the agent and tools - it provides a public API (via `AgentEvent`, `AgentCommand`) for consuming UIs
+- `packages/tui` contains a Ink terminal UI (known from agents like Claude Code)
 
-Set `OPENAI_API_KEY` in `.env`.
-
-## Run
-
-Start the agent from the workspace you want it to operate on:
-
-```sh
-pnpm start
-```
-
-The root `start` script runs `@tinyloop/agent`.
-
-## Package
-
-- `packages/agent/src/agent.ts`: model-tool loop
-- `packages/agent/src/main.ts`: command-line prompt
-- `packages/agent/src/tools`: four default tools
-
-This is not a sandboxed production agent. `write_file`, `edit_file`, and `run_command` can change the current workspace.
+## Future
+- `web GUI` I plan to add a web GUI that interacts with the agent over a local backend. For a rich UX, this is going to introduce more concepts, s.a. persisting sessions, into the codebase.
+- `more commands` not just `user_message` but interrupts, approvals,  message queuing etc.
