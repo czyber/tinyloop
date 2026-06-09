@@ -1,5 +1,9 @@
 import { isAbsolute, relative, resolve } from "node:path";
 import type { FunctionTool, ResponseFunctionToolCall } from "openai/resources/responses/responses.mjs";
+import type { EditFileToolDetails } from "./edit-file";
+import type { ReadFileToolDetails } from "./read-file";
+import type { RunCommandLineToolDetails } from "./run-command";
+import type { WriteFileToolDetails } from "./write-file";
 
 export type ToolArgs = Record<string, unknown>;
 
@@ -14,12 +18,25 @@ export type ToolHandler<TDetails = unknown> = {
 };
 
 export type ToolMap = Record<string, ToolHandler>;
+export type ToolNameOf<TTools extends ToolMap> = Extract<keyof TTools, string>;
+export type ToolDetailsOf<TTool> = TTool extends ToolHandler<infer TDetails> ? TDetails : never;
+export type ToolDetailsFor<TTools extends ToolMap, TName extends ToolNameOf<TTools>> = ToolDetailsOf<TTools[TName]>;
 
 export type ToolOutput = {
   type: "function_call_output";
   call_id: string;
   output: string;
 };
+
+export type ToolExecutionOutput<TName extends string = string, TDetails = unknown> = {
+  name: TName;
+  output: ToolOutput;
+  result: ToolResult<TDetails>;
+};
+
+export type ToolExecutionOutputFor<TTools extends ToolMap, TName extends ToolNameOf<TTools> = ToolNameOf<TTools>> = {
+  [Name in TName]: ToolExecutionOutput<Name, ToolDetailsFor<TTools, Name>>;
+}[TName];
 
 export function resolveWorkspacePath(workspaceRoot: string, path: string): string {
   const resolvedRoot = resolve(workspaceRoot);
@@ -42,11 +59,23 @@ export function requiredStringArg(args: ToolArgs, name: string): string {
   return value;
 }
 
-export function toolDefinitions(tools: ToolMap): FunctionTool[] {
+export function toolDefinitions<TTools extends ToolMap>(tools: TTools): FunctionTool[] {
   return Object.values(tools).map((tool) => tool.definition);
 }
 
-export async function handleToolCall(tools: ToolMap, toolCall: ResponseFunctionToolCall): Promise<ToolOutput> {
+export type ToolDetailsByName = {
+  read_file: ReadFileToolDetails;
+  write_file: WriteFileToolDetails;
+  edit_file: EditFileToolDetails;
+  run_command: RunCommandLineToolDetails;
+};
+
+export type ToolName = keyof ToolDetailsByName;
+
+export async function handleToolCall<TTools extends ToolMap, TName extends ToolNameOf<TTools>>(
+  tools: TTools,
+  toolCall: ResponseFunctionToolCall & { name: TName },
+): Promise<ToolExecutionOutputFor<TTools, TName>> {
   const tool = tools[toolCall.name];
   if (!tool) {
     throw new Error(`Invalid tool call: ${toolCall.name}`);
@@ -55,10 +84,14 @@ export async function handleToolCall(tools: ToolMap, toolCall: ResponseFunctionT
   const args = parseToolArgs(toolCall.arguments);
   const result = await tool.run(args);
   return {
-    type: "function_call_output",
-    call_id: toolCall.call_id,
-    output: result.output,
-  };
+    name: toolCall.name,
+    output: {
+      type: "function_call_output",
+      call_id: toolCall.call_id,
+      output: result.output,
+    },
+    result,
+  } as ToolExecutionOutputFor<TTools, TName>;
 }
 
 function parseToolArgs(rawArgs: string): ToolArgs {

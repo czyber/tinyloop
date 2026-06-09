@@ -43,7 +43,7 @@ function isFileNotFoundError(error: unknown): boolean {
   return error instanceof Error && "code" in error && error.code === "ENOENT";
 }
 
-export function createWriteFileTool(workspaceRoot: string): ToolHandler {
+export function createWriteFileTool(workspaceRoot: string): ToolHandler<WriteFileToolDetails> {
   return {
     definition: {
       type: "function",

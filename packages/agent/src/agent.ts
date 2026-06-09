@@ -1,12 +1,56 @@
 import { OpenAI } from "openai";
 import type { FunctionTool, ResponseFunctionToolCall } from "openai/resources/responses/responses.mjs";
-import type { AgentEventSink } from "./event";
+import type { AgentEventSink, ToolFinishedEvent } from "./event";
 import { createDefaultTools } from "./tools";
+import type { EditFileToolDetails } from "./tools/edit-file";
+import type { ReadFileToolDetails } from "./tools/read-file";
 import { handleToolCall, type ToolMap, type ToolOutput, toolDefinitions } from "./tools/registry";
+import type { RunCommandLineToolDetails } from "./tools/run-command";
+import type { WriteFileToolDetails } from "./tools/write-file";
 import { isToolCall } from "./utils";
 
 const DEFAULT_MODEL = "gpt-5.4-mini";
 const DEFAULT_MAX_TOOL_TURNS = 8;
+
+function toToolFinishedEvent(name: string, callId: string, details: unknown): ToolFinishedEvent {
+  const eventType = "tool.execution.finished";
+  switch (name) {
+    case "read_file":
+      return {
+        type: eventType,
+        name,
+        callId,
+        details: details as ReadFileToolDetails,
+      };
+
+    case "write_file":
+      return {
+        type: eventType,
+        name,
+        callId,
+        details: details as WriteFileToolDetails,
+      };
+
+    case "edit_file":
+      return {
+        type: eventType,
+        name,
+        callId,
+        details: details as EditFileToolDetails,
+      };
+
+    case "run_command":
+      return {
+        type: eventType,
+        name,
+        callId,
+        details: details as RunCommandLineToolDetails,
+      };
+
+    default:
+      throw new Error(`Unknown tool: ${name}`);
+  }
+}
 
 export class Agent {
   private client: OpenAI;
@@ -80,12 +124,9 @@ export async function runToolCalls(
       callId: toolCall.call_id,
       args: toolCall.arguments,
     });
-    toolOutputs.push(await handleToolCall(tools, toolCall));
-    options?.emit({
-      type: "tool.execution.finished",
-      name: toolCall.name,
-      callId: toolCall.call_id,
-    });
+    const execution = await handleToolCall(tools, toolCall);
+    toolOutputs.push(execution.output);
+    options?.emit(toToolFinishedEvent(toolCall.name, toolCall.call_id, execution.result.details));
   }
 
   return toolOutputs;

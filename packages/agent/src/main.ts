@@ -21,6 +21,7 @@ function renderCliEvent(event: AgentEvent): void {
     return;
   } else if (event.type === "tool.execution.finished") {
     console.log(`[${event.type}] ${event.turnId}|${event.sequence} - Tool call ${event.callId} (${event.name})`);
+    console.log(JSON.stringify(event.details));
     return;
   }
 

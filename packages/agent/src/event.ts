@@ -1,10 +1,20 @@
+import type { ToolDetailsByName, ToolName } from "./tools/registry";
+
+export type ToolFinishedEvent = {
+  [Name in ToolName]: {
+    type: "tool.execution.finished";
+    name: Name;
+    callId: string;
+    details: ToolDetailsByName[Name];
+  };
+}[ToolName];
 export type AgentEventPayload =
   | { type: "turn.started" }
   | { type: "turn.completed" }
   | { type: "turn.failed"; error: string }
   | { type: "assistant.message"; text: string }
   | { type: "tool.execution.started"; name: string; callId: string; args: string }
-  | { type: "tool.execution.finished"; name: string; callId: string };
+  | ToolFinishedEvent;
 
 export type AgentEvent = AgentEventPayload & {
   sessionId: string;

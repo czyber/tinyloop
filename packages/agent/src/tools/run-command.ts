@@ -58,7 +58,7 @@ export async function runCommandTool(
   });
 }
 
-export function createRunCommandTool(workspaceRoot: string): ToolHandler {
+export function createRunCommandTool(workspaceRoot: string): ToolHandler<RunCommandLineToolDetails> {
   return {
     definition: {
       type: "function",

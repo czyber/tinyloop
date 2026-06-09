@@ -54,7 +54,7 @@ async function editFileTool(
   };
 }
 
-export function createEditFileTool(workspaceRoot: string): ToolHandler {
+export function createEditFileTool(workspaceRoot: string): ToolHandler<EditFileToolDetails> {
   return {
     definition: {
       type: "function",

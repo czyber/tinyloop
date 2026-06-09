@@ -17,7 +17,7 @@ async function readFileTool(workspaceRoot: string, path: string): Promise<ToolRe
   };
 }
 
-export function createReadFileTool(workspaceRoot: string): ToolHandler {
+export function createReadFileTool(workspaceRoot: string): ToolHandler<ReadFileToolDetails> {
   return {
     definition: {
       type: "function",
