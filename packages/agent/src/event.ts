@@ -1,11 +1,17 @@
 import type { ToolDetailsByName, ToolName } from "./tools/registry";
 
-export type ToolExecutionProgressEvent<TProgress = unknown> = {
-  type: "tool.execution.progress";
-  name: string;
-  callId: string;
-  progress: TProgress;
+export type ToolProgressByName = {
+  run_command: string;
 };
+
+export type ToolExecutionProgressEvent = {
+  [Name in keyof ToolProgressByName]: {
+    type: "tool.execution.progress";
+    name: string;
+    callId: string;
+    progress: ToolProgressByName[Name];
+  };
+}[keyof ToolProgressByName];
 
 export type ToolFinishedEvent = {
   [Name in ToolName]: {
