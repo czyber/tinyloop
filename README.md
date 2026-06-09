@@ -1,8 +1,8 @@
 # tinyloop
 
-tinyloop is a tiny coding agent, I originally create to learn about how to build such a system in a pragmatic way.
+tinyloop is a tiny coding agent, I originally created to learn about how to build such a system in a pragmatic manner.
 
-It is by design minimalistic and not a production ready agent. While I plan to implement advanced features and eventually grow it into a small, usable agent - it will replace existing coding agents s.a. Pi, Codex or Claude Code.
+It is by design minimalistic and not a production ready agent. While I plan to implement advanced features and eventually grow it into a small, usable agent - it won't replace existing coding agents s.a. Pi, Codex or Claude Code.
 
 The goal for this project is to create something usable, which is a great starting point to learn about agent intrinsics.
 
