@@ -1,5 +1,6 @@
 import { isAbsolute, relative, resolve } from "node:path";
 import type { FunctionTool, ResponseFunctionToolCall } from "openai/resources/responses/responses.mjs";
+import type { AgentEventSink } from "../event";
 import type { EditFileToolDetails } from "./edit-file";
 import type { ReadFileToolDetails } from "./read-file";
 import type { RunCommandLineToolDetails } from "./run-command";
@@ -12,9 +13,15 @@ export type ToolResult<TDetails = unknown> = {
   details?: TDetails;
 };
 
+export type ToolRunContext = {
+  name: string;
+  callId: string;
+  emit: AgentEventSink;
+};
+
 export type ToolHandler<TDetails = unknown> = {
   definition: FunctionTool;
-  run: (args: ToolArgs) => ToolResult<TDetails> | Promise<ToolResult<TDetails>>;
+  run: (args: ToolArgs, context: ToolRunContext) => ToolResult<TDetails> | Promise<ToolResult<TDetails>>;
 };
 
 export type ToolMap = Record<string, ToolHandler>;
@@ -75,14 +82,15 @@ export type ToolName = keyof ToolDetailsByName;
 export async function handleToolCall<TTools extends ToolMap, TName extends ToolNameOf<TTools>>(
   tools: TTools,
   toolCall: ResponseFunctionToolCall & { name: TName },
+  options: { emit: AgentEventSink },
 ): Promise<ToolExecutionOutputFor<TTools, TName>> {
   const tool = tools[toolCall.name];
   if (!tool) {
     throw new Error(`Invalid tool call: ${toolCall.name}`);
   }
-
+  const context: ToolRunContext = { name: toolCall.name, callId: toolCall.call_id, emit: options.emit };
   const args = parseToolArgs(toolCall.arguments);
-  const result = await tool.run(args);
+  const result = await tool.run(args, context);
   return {
     name: toolCall.name,
     output: {

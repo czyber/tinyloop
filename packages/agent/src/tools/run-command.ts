@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import type { ToolHandler, ToolResult } from "./registry";
+import type { ToolHandler, ToolResult, ToolRunContext } from "./registry";
 import { requiredStringArg } from "./registry";
 
 export type RunCommandLineToolDetails = {
@@ -16,6 +16,7 @@ function formatCommandOutput(details: RunCommandLineToolDetails): string {
 export async function runCommandTool(
   workspaceRoot: string,
   command: string,
+  context: ToolRunContext,
 ): Promise<ToolResult<RunCommandLineToolDetails>> {
   return await new Promise((resolve, reject) => {
     const childProcess = spawn(command, { cwd: workspaceRoot, shell: true });
@@ -29,6 +30,7 @@ export async function runCommandTool(
 
     childProcess.stdout.setEncoding("utf-8");
     childProcess.stdout.on("data", (chunk) => {
+      context.emit({ type: "tool.execution.progress", name: context.name, callId: context.callId, progress: chunk });
       stdout += chunk;
     });
 
@@ -77,9 +79,9 @@ export function createRunCommandTool(workspaceRoot: string): ToolHandler<RunComm
       },
       strict: true,
     },
-    run: async (input) => {
+    run: async (input, context: ToolRunContext) => {
       const command = requiredStringArg(input, "command");
-      return await runCommandTool(workspaceRoot, command);
+      return await runCommandTool(workspaceRoot, command, context);
     },
   };
 }

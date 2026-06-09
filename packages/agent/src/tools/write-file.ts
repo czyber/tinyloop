@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { createTwoFilesPatch } from "diff";
-import type { ToolHandler, ToolResult } from "./registry";
+import type { ToolHandler, ToolResult, ToolRunContext } from "./registry";
 
 import { requiredStringArg, resolveWorkspacePath } from "./registry";
 
@@ -14,6 +14,7 @@ async function writeFileTool(
   workspaceRoot: string,
   path: string,
   content: string,
+  context: ToolRunContext,
 ): Promise<ToolResult<WriteFileToolDetails>> {
   const filePath = resolveWorkspacePath(workspaceRoot, path);
   await mkdir(dirname(filePath), { recursive: true });
@@ -66,10 +67,10 @@ export function createWriteFileTool(workspaceRoot: string): ToolHandler<WriteFil
       },
       strict: true,
     },
-    run: async (input) => {
+    run: async (input, context: ToolRunContext) => {
       const path = requiredStringArg(input, "path");
       const content = requiredStringArg(input, "content");
-      return await writeFileTool(workspaceRoot, path, content);
+      return await writeFileTool(workspaceRoot, path, content, context);
     },
   };
 }

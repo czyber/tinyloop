@@ -1,12 +1,16 @@
 import { readFile } from "node:fs/promises";
-import type { ToolHandler, ToolResult } from "./registry";
+import type { ToolHandler, ToolResult, ToolRunContext } from "./registry";
 import { requiredStringArg, resolveWorkspacePath } from "./registry";
 
 export type ReadFileToolDetails = {
   path: string;
 };
 
-async function readFileTool(workspaceRoot: string, path: string): Promise<ToolResult<ReadFileToolDetails>> {
+async function readFileTool(
+  workspaceRoot: string,
+  path: string,
+  context: ToolRunContext,
+): Promise<ToolResult<ReadFileToolDetails>> {
   const filePath = resolveWorkspacePath(workspaceRoot, path);
   const result = await readFile(filePath, "utf-8");
   return {
@@ -36,9 +40,9 @@ export function createReadFileTool(workspaceRoot: string): ToolHandler<ReadFileT
       },
       strict: true,
     },
-    run: async (input) => {
+    run: async (input, context: ToolRunContext) => {
       const path = requiredStringArg(input, "path");
-      return await readFileTool(workspaceRoot, path);
+      return await readFileTool(workspaceRoot, path, context);
     },
   };
 }

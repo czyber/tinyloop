@@ -72,7 +72,7 @@ export class Agent {
     this.previousResponseId = undefined;
   }
 
-  async runOneUserTurn(userInput: string, options?: { emit: AgentEventSink }): Promise<string> {
+  async runOneUserTurn(userInput: string, options: { emit: AgentEventSink }): Promise<string> {
     let turnInput: TurnInput = [{ role: "user", content: userInput }];
 
     for (let turn = 0; turn < this.maxToolTurns; ++turn) {
@@ -113,7 +113,7 @@ type TurnInput = Array<UserInput | ToolOutput>;
 export async function runToolCalls(
   tools: ToolMap,
   toolCalls: ResponseFunctionToolCall[],
-  options?: { emit: AgentEventSink },
+  options: { emit: AgentEventSink },
 ): Promise<ToolOutput[]> {
   const toolOutputs: ToolOutput[] = [];
 
@@ -124,7 +124,7 @@ export async function runToolCalls(
       callId: toolCall.call_id,
       args: toolCall.arguments,
     });
-    const execution = await handleToolCall(tools, toolCall);
+    const execution = await handleToolCall(tools, toolCall, options);
     toolOutputs.push(execution.output);
     options?.emit(toToolFinishedEvent(toolCall.name, toolCall.call_id, execution.result.details));
   }

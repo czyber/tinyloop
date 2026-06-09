@@ -1,6 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { createTwoFilesPatch } from "diff";
-import type { ToolHandler, ToolResult } from "./registry";
+import type { ToolHandler, ToolResult, ToolRunContext } from "./registry";
 import { requiredStringArg, resolveWorkspacePath } from "./registry";
 
 function countOccurrences(text: string, search: string): number {
@@ -22,6 +22,7 @@ async function editFileTool(
   path: string,
   oldSnippet: string,
   newSnippet: string,
+  context: ToolRunContext,
 ): Promise<ToolResult<EditFileToolDetails>> {
   if (oldSnippet.length === 0) {
     throw new Error("oldSnippet must not be empty.");
@@ -81,11 +82,11 @@ export function createEditFileTool(workspaceRoot: string): ToolHandler<EditFileT
       },
       strict: true,
     },
-    run: async (input) => {
+    run: async (input, context: ToolRunContext) => {
       const path = requiredStringArg(input, "path");
       const oldSnippet = requiredStringArg(input, "oldSnippet");
       const newSnippet = requiredStringArg(input, "newSnippet");
-      return await editFileTool(workspaceRoot, path, oldSnippet, newSnippet);
+      return await editFileTool(workspaceRoot, path, oldSnippet, newSnippet, context);
     },
   };
 }
