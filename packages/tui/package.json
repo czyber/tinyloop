@@ -1,0 +1,27 @@
+{
+  "name": "@tinyloop/tui",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Ink terminal UI for tinyloop.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "tinyloop-tui": "src/main.tsx"
+  },
+  "scripts": {
+    "start": "tsx src/main.tsx",
+    "test": "pnpm typecheck",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tinyloop/agent": "workspace:*",
+    "ink": "^5.0.0",
+    "react": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^6.0.0"
+  }
+}

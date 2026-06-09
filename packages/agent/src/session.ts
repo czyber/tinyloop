@@ -5,7 +5,8 @@ import type { AgentEvent, AgentEventPayload } from "./event";
 
 export type CommandType = "user_message" | "tool_call";
 
-export type Command = {
+// Later this will become a discriminated union for other commands s.a. type: "cancel_turn", turnId?: string
+export type AgentCommand = {
   type: CommandType;
   text: string;
 };
@@ -40,7 +41,7 @@ export class AgentSession {
     this.emitter.emit("event", event);
   }
 
-  async dispatch(command: Command): Promise<void> {
+  async dispatch(command: AgentCommand): Promise<void> {
     const turnId = randomUUID();
     this.emitForTurn(turnId, { type: "turn.started" });
     if (command.type === "user_message") {
