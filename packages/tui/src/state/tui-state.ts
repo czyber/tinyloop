@@ -1,6 +1,6 @@
 export type TranscriptItem =
-  | { type: "user"; text: string }
-  | { type: "assistant"; text: string }
+  | { type: "user"; text: string; sequence: number }
+  | { type: "assistant"; text: string; sequence: number }
   | {
       type: "tool";
       callId: string;
@@ -9,8 +9,9 @@ export type TranscriptItem =
       args: string;
       output: string;
       details?: unknown;
+      sequence: number;
     }
-  | { type: "error"; text: string };
+  | { type: "error"; text: string; sequence: number };
 
 export type TurnView = {
   id: string;
