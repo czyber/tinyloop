@@ -44,6 +44,7 @@ export class AgentSession {
   async dispatch(command: AgentCommand): Promise<void> {
     const turnId = randomUUID();
     this.emitForTurn(turnId, { type: "turn.started" });
+    this.emitForTurn(turnId, { type: "user.message", text: command.text });
     if (command.type === "user_message") {
       try {
         const response = await this.agent.runOneUserTurn(command.text, {

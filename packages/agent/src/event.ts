@@ -26,6 +26,7 @@ export type AgentEventPayload =
   | { type: "turn.started" }
   | { type: "turn.completed" }
   | { type: "turn.failed"; error: string }
+  | { type: "user.message"; text: string }
   | { type: "assistant.message"; text: string }
   | { type: "tool.execution.started"; name: string; callId: string; args: string }
   | ToolExecutionProgressEvent
