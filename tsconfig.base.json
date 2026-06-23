@@ -4,9 +4,6 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "strict": true,
-    "paths": {
-      "@tinyloop/agent": ["./packages/agent/src/index.ts"]
-    },
     "types": ["node"],
     "skipLibCheck": true
   }
