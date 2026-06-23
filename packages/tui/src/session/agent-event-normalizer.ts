@@ -42,8 +42,12 @@ export function toUiSessionEvent(event: AgentEvent): UiSessionEvent {
         name: event.name,
         details: event.details,
       };
-    default:
-      throw new Error(`Unknown event type ${event.type}`);
+    case "user.message":
+      return {
+        ...meta,
+        type: "user.message",
+        text: event.text,
+      };
   }
 }
 

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { SessionDriver } from "../session/session-driver.js";
 import { reduceSessionEvent } from "../state/reduce-session-event.js";
 import { initialTuiState } from "../state/tui-state.js";
+import { PromptInput } from "./prompt-input.js";
 import { StatusBar } from "./status-bar.js";
 import { Transcript } from "./transcript.js";
 
@@ -36,6 +37,7 @@ export function App({ sessionDriver }: AppProps) {
     <>
       <StatusBar status={state.status} />
       <Transcript turns={state.turns} />
+      <PromptInput disabled={false} onSubmit={(text) => sessionDriver.sendUserMessage(text)} />
     </>
   );
 }

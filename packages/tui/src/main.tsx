@@ -3,12 +3,13 @@ import { dirname, join, parse } from "node:path";
 import * as dotenv from "dotenv";
 import { render } from "ink";
 import { App } from "./components/app.js";
+import { createAgentSessionDriver } from "./session/agent-session-driver.js";
 import { createFakeSessionDriver } from "./session/fake-session-driver.js";
 
 const workspaceRoot = findWorkspaceRoot(process.cwd());
 dotenv.config({ path: join(workspaceRoot, ".env"), quiet: true });
 
-const sessionDriver = createFakeSessionDriver({
+const sessionDriver1 = createFakeSessionDriver({
   events: [
     { type: "turn.started", turnId: "t-1", sessionId: "s-1", sequence: 1 },
     { type: "user.message", turnId: "t-1", sessionId: "s-1", sequence: 2, text: "Hello" },
@@ -43,6 +44,8 @@ const sessionDriver = createFakeSessionDriver({
     { type: "turn.completed", turnId: "t-1", sessionId: "s-1", sequence: 7 },
   ],
 });
+
+const sessionDriver = createAgentSessionDriver(workspaceRoot);
 
 function findWorkspaceRoot(startPath: string): string {
   let currentPath = startPath;
