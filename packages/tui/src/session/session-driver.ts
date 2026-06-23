@@ -2,6 +2,7 @@ export type UiSessionEvent =
   | (UiSessionEventMeta & { type: "turn.started" })
   | (UiSessionEventMeta & { type: "turn.completed" })
   | (UiSessionEventMeta & { type: "turn.failed"; error: string })
+  | (UiSessionEventMeta & { type: "user.message"; text: string })
   | (UiSessionEventMeta & { type: "assistant.message"; text: string })
   | (UiSessionEventMeta & {
       type: "tool.started";

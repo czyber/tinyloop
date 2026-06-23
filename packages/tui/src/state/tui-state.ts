@@ -24,3 +24,8 @@ export type TuiState = {
   activeTurnId?: string;
   error?: string;
 };
+
+export const initialTuiState: TuiState = {
+  status: "idle",
+  turns: [],
+};
