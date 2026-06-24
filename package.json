@@ -14,11 +14,27 @@
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "test": "pnpm -r test",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "pack:check": "pnpm build && pnpm --filter @tinyloop/agent pack --dry-run && pnpm --filter @tinyloop/tui pack --dry-run"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "agent",
+    "coding-agent",
+    "terminal-ui",
+    "ink",
+    "openai",
+    "typescript"
+  ],
+  "author": "czyber",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/czyber/tinyloop.git"
+  },
+  "bugs": {
+    "url": "https://github.com/czyber/tinyloop/issues"
+  },
+  "homepage": "https://github.com/czyber/tinyloop#readme",
   "devDependencies": {
     "@biomejs/biome": "^2.4.16",
     "@types/node": "^25.9.1"

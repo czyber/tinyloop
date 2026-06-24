@@ -1,10 +1,32 @@
 {
   "name": "@tinyloop/agent",
   "version": "0.1.0",
-  "private": true,
   "description": "The tinyloop agent loop and default tools.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "author": "czyber",
+  "keywords": [
+    "agent",
+    "coding-agent",
+    "openai",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/czyber/tinyloop.git",
+    "directory": "packages/agent"
+  },
+  "bugs": {
+    "url": "https://github.com/czyber/tinyloop/issues"
+  },
+  "homepage": "https://github.com/czyber/tinyloop#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "start": "tsx src/main.ts",

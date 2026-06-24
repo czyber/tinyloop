@@ -52,6 +52,7 @@ export function createDemoSessionDriver(): SessionDriver {
         type: "tool.finished",
         callId,
         name: "run_command",
+        output: "demo mode\n",
         details: {
           command,
           stdout: "demo mode\n",

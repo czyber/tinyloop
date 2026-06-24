@@ -31,6 +31,7 @@ const events: UiSessionEvent[] = [
     sequence: 5,
     callId: "call-1",
     name: "run_command",
+    output: "exit_code: 0\nstdout:\nREADME.md\n\nstderr:\n",
     details: { command: "ls", stdout: "README.md\n", stderr: "", exitCode: 0 },
   },
   { type: "assistant.message", sessionId: "s-1", turnId: "t-1", sequence: 6, text: "I found README.md." },

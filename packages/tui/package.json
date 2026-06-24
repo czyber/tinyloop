@@ -6,17 +6,42 @@
   "description": "Ink terminal UI for tinyloop.",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
+  "files": [
+    "dist"
+  ],
   "bin": {
     "tinyloop": "dist/main.js"
+  },
+  "license": "MIT",
+  "author": "czyber",
+  "keywords": [
+    "agent",
+    "coding-agent",
+    "terminal-ui",
+    "ink",
+    "openai",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/czyber/tinyloop.git",
+    "directory": "packages/tui"
+  },
+  "bugs": {
+    "url": "https://github.com/czyber/tinyloop/issues"
+  },
+  "homepage": "https://github.com/czyber/tinyloop#readme",
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "start": "tsx src/main.tsx",
     "test": "pnpm typecheck && tsx test/reduce-session-event.test.ts",
     "build": "pnpm --filter @tinyloop/agent build && tsc",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "pnpm --filter @tinyloop/agent build && tsc --noEmit"
   },
   "dependencies": {
-    "@tinyloop/agent": "workspace:*",
+    "@tinyloop/agent": "workspace:^",
     "cli-highlight": "2.1.11",
     "dotenv": "^17.4.2",
     "ink": "^5.0.0",

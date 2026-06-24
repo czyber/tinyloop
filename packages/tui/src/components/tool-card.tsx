@@ -1,7 +1,9 @@
 import { Box, Text } from "ink";
 import type { TranscriptItem } from "../state/tui-state.js";
+import { AssistantMessage } from "./assistant-message.js";
 
 type ToolItem = Extract<TranscriptItem, { type: "tool" }>;
+const MAX_OUTPUT_LINES = 18;
 
 export type ToolCardProps = {
   item: ToolItem;
@@ -9,6 +11,7 @@ export type ToolCardProps = {
 
 export function ToolCard({ item }: ToolCardProps) {
   const summary = summarizeTool(item);
+  const output = formatToolOutput(item.output);
 
   return (
     <Box
@@ -25,10 +28,18 @@ export function ToolCard({ item }: ToolCardProps) {
         <Text color={item.status === "running" ? "yellow" : "green"}>{item.status}</Text>
       </Text>
       {summary ? <Text dimColor>{summary}</Text> : null}
-      {item.output.length > 0 ? <Text>{item.output.trimEnd()}</Text> : null}
+      {output ? <ToolOutputView output={output} /> : null}
       {item.status === "completed" ? <Text dimColor>{summarizeDetails(item.details)}</Text> : null}
     </Box>
   );
+}
+
+function ToolOutputView({ output }: { output: string }) {
+  if (looksLikeUnifiedDiff(output)) {
+    return <AssistantMessage text={["```diff", output, "```"].join("\n")} />;
+  }
+
+  return <Text>{output}</Text>;
 }
 
 function summarizeTool(item: ToolItem): string | undefined {
@@ -54,6 +65,24 @@ function summarizeDetails(details: unknown): string {
   }
 
   return "completed";
+}
+
+function formatToolOutput(output: string): string | undefined {
+  const trimmedOutput = output.trimEnd();
+  if (trimmedOutput.length === 0) {
+    return undefined;
+  }
+
+  const lines = trimmedOutput.split("\n");
+  if (lines.length <= MAX_OUTPUT_LINES) {
+    return trimmedOutput;
+  }
+
+  return [...lines.slice(0, MAX_OUTPUT_LINES), `... ${lines.length - MAX_OUTPUT_LINES} more lines`].join("\n");
+}
+
+function looksLikeUnifiedDiff(output: string): boolean {
+  return output.startsWith("Index: ") || output.includes("\n@@ ");
 }
 
 function parseRecord(value: string): Record<string, unknown> | undefined {

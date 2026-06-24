@@ -7,9 +7,10 @@ type AssistantMessageProps = {
 };
 
 type MarkdownBlock =
-  | { type: "text"; lines: string[] }
+  | { type: "text"; id: number; lines: string[] }
   | {
       type: "code";
+      id: number;
       language: string | undefined;
       lines: string[];
     };
@@ -28,8 +29,8 @@ function MarkdownBlockView({ block }: { block: MarkdownBlock }) {
   if (block.type === "text") {
     return (
       <>
-        {block.lines.map((line) => (
-          <Text key={line}>{line}</Text>
+        {keyedLines(block.lines, block.id).map(({ key, line }) => (
+          <Text key={key}>{line}</Text>
         ))}
       </>
     );
@@ -39,7 +40,7 @@ function MarkdownBlockView({ block }: { block: MarkdownBlock }) {
     <Box flexDirection="column" marginY={1}>
       <Text dimColor>{block.language ? block.language : "code"}</Text>
       {isDiffLanguage(block.language) ? (
-        block.lines.map((line) => <DiffLine line={line} key={line} />)
+        keyedLines(block.lines, block.id).map(({ key, line }) => <DiffLine line={line} key={key} />)
       ) : (
         <SyntaxHighlight code={block.lines.join("\n")} language={highlightLanguage(block.language)} />
       )}
@@ -110,12 +111,22 @@ function parseLanguageName(language: string | undefined): string | undefined {
   return firstWord;
 }
 
-function blockKey(block: MarkdownBlock): string {
-  if (block.type === "text") {
-    return `${block.type}-${block.lines.join("\n")}`;
-  }
+function keyedLines(lines: string[], blockId: number): Array<{ key: string; line: string }> {
+  const seen = new Map<string, number>();
 
-  return `${block.type}-${block.language ?? ""}-${block.lines.join("\n")}`;
+  return lines.map((line) => {
+    const occurrence = seen.get(line) ?? 0;
+    seen.set(line, occurrence + 1);
+
+    return {
+      key: `${blockId}-${occurrence}-${line}`,
+      line,
+    };
+  });
+}
+
+function blockKey(block: MarkdownBlock): string {
+  return `${block.type}-${block.id}`;
 }
 
 function parseMarkdownBlocks(text: string): MarkdownBlock[] {
@@ -129,7 +140,7 @@ function parseMarkdownBlocks(text: string): MarkdownBlock[] {
       return;
     }
 
-    blocks.push({ type: "text", lines: textBuffer.splice(0) });
+    blocks.push({ type: "text", id: blocks.length, lines: textBuffer.splice(0) });
   }
 
   function flushCode() {
@@ -137,7 +148,7 @@ function parseMarkdownBlocks(text: string): MarkdownBlock[] {
       return;
     }
 
-    blocks.push({ type: "code", language: codeLanguage, lines: codeBuffer });
+    blocks.push({ type: "code", id: blocks.length, language: codeLanguage, lines: codeBuffer });
     codeBuffer = undefined;
     codeLanguage = undefined;
   }

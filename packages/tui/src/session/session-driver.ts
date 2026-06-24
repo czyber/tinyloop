@@ -20,6 +20,7 @@ export type UiSessionEvent =
       type: "tool.finished";
       callId: string;
       name: string;
+      output: string;
       details: unknown;
     });
 

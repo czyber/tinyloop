@@ -40,6 +40,7 @@ export function toUiSessionEvent(event: AgentEvent): UiSessionEvent {
         type: "tool.finished",
         callId: event.callId,
         name: event.name,
+        output: event.output,
         details: event.details,
       };
     case "user.message":

@@ -12,7 +12,7 @@ import { isToolCall } from "./utils";
 const DEFAULT_MODEL = "gpt-5.4-mini";
 const DEFAULT_MAX_TOOL_TURNS = 8;
 
-function toToolFinishedEvent(name: string, callId: string, details: unknown): ToolFinishedEvent {
+function toToolFinishedEvent(name: string, callId: string, output: string, details: unknown): ToolFinishedEvent {
   const eventType = "tool.execution.finished";
   switch (name) {
     case "read_file":
@@ -20,6 +20,7 @@ function toToolFinishedEvent(name: string, callId: string, details: unknown): To
         type: eventType,
         name,
         callId,
+        output,
         details: details as ReadFileToolDetails,
       };
 
@@ -28,6 +29,7 @@ function toToolFinishedEvent(name: string, callId: string, details: unknown): To
         type: eventType,
         name,
         callId,
+        output,
         details: details as WriteFileToolDetails,
       };
 
@@ -36,6 +38,7 @@ function toToolFinishedEvent(name: string, callId: string, details: unknown): To
         type: eventType,
         name,
         callId,
+        output,
         details: details as EditFileToolDetails,
       };
 
@@ -44,6 +47,7 @@ function toToolFinishedEvent(name: string, callId: string, details: unknown): To
         type: eventType,
         name,
         callId,
+        output,
         details: details as RunCommandLineToolDetails,
       };
 
@@ -126,7 +130,9 @@ export async function runToolCalls(
     });
     const execution = await handleToolCall(tools, toolCall, options);
     toolOutputs.push(execution.output);
-    options?.emit(toToolFinishedEvent(toolCall.name, toolCall.call_id, execution.result.details));
+    options?.emit(
+      toToolFinishedEvent(toolCall.name, toolCall.call_id, execution.result.output, execution.result.details),
+    );
   }
 
   return toolOutputs;

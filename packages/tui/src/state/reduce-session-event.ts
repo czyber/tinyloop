@@ -120,6 +120,7 @@ export function reduceSessionEvent(state: TuiState, event: UiSessionEvent): TuiS
           updateToolItem(turn, event.callId, (tool) => ({
             ...tool,
             status: "completed",
+            output: tool.output.length > 0 ? tool.output : event.output,
             details: event.details,
           })),
         ),

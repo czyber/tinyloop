@@ -31,11 +31,11 @@ async function writeFileTool(
   await writeFile(filePath, content, "utf-8");
 
   if (before === undefined) {
-    return { output: `Created ${filePath}`, details: { path, content } };
+    return { output: `Created ${path}`, details: { path, content } };
   }
 
   return {
-    output: createTwoFilesPatch(filePath, filePath, before, content, "before", "after"),
+    output: createTwoFilesPatch(path, path, before, content, "before", "after"),
     details: { path, content },
   };
 }

@@ -40,7 +40,7 @@ importers:
   packages/tui:
     dependencies:
       '@tinyloop/agent':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../agent
       cli-highlight:
         specifier: 2.1.11

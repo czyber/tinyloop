@@ -18,6 +18,7 @@ export type ToolFinishedEvent = {
     type: "tool.execution.finished";
     name: Name;
     callId: string;
+    output: string;
     details: ToolDetailsByName[Name];
   };
 }[ToolName];

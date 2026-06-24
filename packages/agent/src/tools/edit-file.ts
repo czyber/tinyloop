@@ -43,7 +43,7 @@ async function editFileTool(
   }
 
   const after = before.replace(oldSnippet, newSnippet);
-  const diff = createTwoFilesPatch(filePath, filePath, before, after, "before", "after");
+  const diff = createTwoFilesPatch(path, path, before, after, "before", "after");
   await writeFile(filePath, after, "utf-8");
   return {
     output: diff,
