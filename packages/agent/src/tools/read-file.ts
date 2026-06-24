@@ -9,7 +9,7 @@ export type ReadFileToolDetails = {
 async function readFileTool(
   workspaceRoot: string,
   path: string,
-  context: ToolRunContext,
+  _context: ToolRunContext,
 ): Promise<ToolResult<ReadFileToolDetails>> {
   const filePath = resolveWorkspacePath(workspaceRoot, path);
   const result = await readFile(filePath, "utf-8");

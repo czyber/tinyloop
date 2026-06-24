@@ -22,7 +22,7 @@ async function editFileTool(
   path: string,
   oldSnippet: string,
   newSnippet: string,
-  context: ToolRunContext,
+  _context: ToolRunContext,
 ): Promise<ToolResult<EditFileToolDetails>> {
   if (oldSnippet.length === 0) {
     throw new Error("oldSnippet must not be empty.");

@@ -1,4 +1,6 @@
-import { Text, useInput } from "ink";
+import { Box, Text } from "ink";
+import Spinner from "ink-spinner";
+import TextInput from "ink-text-input";
 import { useState } from "react";
 
 export type PromptInputProps = {
@@ -8,22 +10,39 @@ export type PromptInputProps = {
 
 export function PromptInput({ disabled, onSubmit }: PromptInputProps) {
   const [value, setValue] = useState("");
-  useInput((input, key) => {
-    if (input) {
-      setValue(value + input);
-    }
-    if (key.delete) {
-      setValue(value.slice(0, -1));
-    }
-    if (key.return) {
-      onSubmit(value);
-      setValue("");
-    }
-  });
+
   return (
-    <Text>
-      <Text color={disabled ? "gray" : "cyan"}>{disabled ? "…" : "›"}</Text>
-      <Text dimColor={value.length === 0}> {value.length === 0 ? "Ask tinyloop..." : value}</Text>
-    </Text>
+    <Box>
+      {disabled ? (
+        <>
+          <Text color="yellow">
+            <Spinner type="dots" />
+          </Text>
+          <Text dimColor> working...</Text>
+        </>
+      ) : (
+        <>
+          <Text color="cyan">{"> "}</Text>
+          <TextInput
+            focus={!disabled}
+            highlightPastedText
+            onChange={setValue}
+            onSubmit={(submittedValue) => {
+              const trimmedValue = submittedValue.trim();
+              if (trimmedValue.length === 0) {
+                return;
+              }
+
+              setValue("");
+              void onSubmit(trimmedValue);
+            }}
+            placeholder="Ask tinyloop..."
+            showCursor
+            value={value}
+          />
+          <Text dimColor> Enter to send</Text>
+        </>
+      )}
+    </Box>
   );
 }

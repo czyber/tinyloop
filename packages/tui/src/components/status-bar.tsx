@@ -2,13 +2,17 @@ import { Text } from "ink";
 import type { TuiState } from "../state/tui-state.js";
 
 export type StatusBarProps = {
+  mode: "agent" | "demo";
   status: TuiState["status"];
 };
 
-export function StatusBar({ status }: StatusBarProps) {
+export function StatusBar({ mode, status }: StatusBarProps) {
   return (
     <Text>
-      <Text dimColor>Status: </Text>
+      <Text color="green">tinyloop</Text>
+      <Text dimColor> · </Text>
+      <Text color={mode === "demo" ? "yellow" : "cyan"}>{mode}</Text>
+      <Text dimColor> · status: </Text>
       <Text color={statusColor(status)}>{status}</Text>
     </Text>
   );

@@ -1,16 +1,19 @@
+import { Box } from "ink";
 import { useEffect, useState } from "react";
 import type { SessionDriver } from "../session/session-driver.js";
 import { reduceSessionEvent } from "../state/reduce-session-event.js";
 import { initialTuiState } from "../state/tui-state.js";
 import { PromptInput } from "./prompt-input.js";
+import { Separator } from "./separator.js";
 import { StatusBar } from "./status-bar.js";
 import { Transcript } from "./transcript.js";
 
 export type AppProps = {
+  mode: "agent" | "demo";
   sessionDriver: SessionDriver;
 };
 
-export function App({ sessionDriver }: AppProps) {
+export function App({ mode, sessionDriver }: AppProps) {
   const [state, setState] = useState(initialTuiState);
 
   useEffect(() => {
@@ -34,10 +37,14 @@ export function App({ sessionDriver }: AppProps) {
   }, [sessionDriver]);
 
   return (
-    <>
-      <StatusBar status={state.status} />
-      <Transcript turns={state.turns} />
-      <PromptInput disabled={false} onSubmit={(text) => sessionDriver.sendUserMessage(text)} />
-    </>
+    <Box flexDirection="column">
+      <StatusBar mode={mode} status={state.status} />
+      <Separator />
+      <Box flexDirection="column" marginY={1}>
+        <Transcript turns={state.turns} />
+      </Box>
+      <Separator />
+      <PromptInput disabled={state.status === "running"} onSubmit={(text) => sessionDriver.sendUserMessage(text)} />
+    </Box>
   );
 }

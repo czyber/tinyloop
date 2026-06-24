@@ -4,7 +4,9 @@
   "private": true,
   "description": "A tiny workspace for a minimal tool-using agent loop.",
   "scripts": {
-    "start": "pnpm --filter @tinyloop/agent start",
+    "start": "pnpm --filter @tinyloop/tui start",
+    "demo": "pnpm --filter @tinyloop/tui start -- --demo",
+    "build": "pnpm --filter @tinyloop/tui build",
     "check": "biome check . && pnpm -r typecheck",
     "check:fix": "biome check --write .",
     "format": "biome format --write .",

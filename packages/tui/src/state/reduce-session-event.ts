@@ -45,6 +45,21 @@ export function reduceSessionEvent(state: TuiState, event: UiSessionEvent): TuiS
         turns: updatedTurns,
       };
     }
+
+    case "turn.failed": {
+      return {
+        ...state,
+        activeTurnId: state.activeTurnId === event.turnId ? undefined : state.activeTurnId,
+        error: event.error,
+        status: "failed",
+        turns: updateTurn(state, event.turnId, (turn) => ({
+          ...turn,
+          status: "failed",
+          items: [...turn.items, { type: "error", text: event.error, sequence: event.sequence }],
+        })),
+      };
+    }
+
     case "assistant.message": {
       return {
         ...state,

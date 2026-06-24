@@ -11,14 +11,18 @@
   },
   "scripts": {
     "start": "tsx src/main.tsx",
-    "test": "pnpm typecheck",
+    "test": "pnpm typecheck && tsx test/reduce-session-event.test.ts",
     "build": "pnpm --filter @tinyloop/agent build && tsc",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@tinyloop/agent": "workspace:*",
+    "cli-highlight": "2.1.11",
     "dotenv": "^17.4.2",
     "ink": "^5.0.0",
+    "ink-spinner": "^5.0.0",
+    "ink-syntax-highlight": "^2.0.2",
+    "ink-text-input": "^6.0.0",
     "react": "^18.0.0"
   },
   "devDependencies": {

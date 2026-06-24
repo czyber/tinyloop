@@ -14,7 +14,7 @@ async function writeFileTool(
   workspaceRoot: string,
   path: string,
   content: string,
-  context: ToolRunContext,
+  _context: ToolRunContext,
 ): Promise<ToolResult<WriteFileToolDetails>> {
   const filePath = resolveWorkspacePath(workspaceRoot, path);
   await mkdir(dirname(filePath), { recursive: true });
