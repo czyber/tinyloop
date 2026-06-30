@@ -1,7 +1,7 @@
 import { Agent, type AgentOptions, AgentSession } from "tinyloop-agent";
+import type { SessionDriver } from "tinyloop-tui";
 
 import { toUiSessionEvent } from "./agent-event-normalizer.js";
-import type { SessionDriver } from "./session-driver.js";
 
 export type AgentSessionDriverOptions = Omit<AgentOptions, "workspaceRoot">;
 

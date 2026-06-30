@@ -16,7 +16,13 @@ Install the CLI:
 npm install --global tinyloop
 ```
 
-Save your OpenAI API key once:
+Use your ChatGPT subscription via Codex:
+
+```bash
+tinyloop auth login chatgpt
+```
+
+Or save your OpenAI API key once:
 
 ```bash
 tinyloop auth login
@@ -63,7 +69,7 @@ pnpm build
 Install the local CLI globally for dogfooding:
 
 ```bash
-pnpm add --global ./packages/tui
+pnpm add --global ./packages/cli
 tinyloop
 ```
 
@@ -78,7 +84,8 @@ Then restart your terminal.
 ## Packages
 
 - `packages/agent` publishes as `tinyloop-agent`. It contains the agent loop and tools. It exposes the public session contract through `AgentEvent`, `AgentCommand`, and `AgentSession`.
-- `packages/tui` publishes as `tinyloop`. It contains the Ink terminal UI. It talks to the agent through a small `SessionDriver`, resolves local auth, reduces session events into view state, and renders the transcript.
+- `packages/tui` publishes as `tinyloop-tui`. It contains the Ink terminal UI, the `SessionDriver` contract, reducers, and transcript components.
+- `packages/cli` publishes as `tinyloop`. It resolves local auth, creates the agent-backed session driver, and renders the TUI.
 
 ## Architecture
 

@@ -4,7 +4,8 @@ import SiteHeader from "../../components/SiteHeader.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const installCommand = "npm install -g tinyloop";
-const loginCommand = "tinyloop auth login";
+const chatgptLoginCommand = "tinyloop auth login chatgpt";
+const apiKeyLoginCommand = "tinyloop auth login";
 const statusCommand = "tinyloop auth status";
 const startCommand = "tinyloop";
 ---
@@ -39,9 +40,9 @@ const startCommand = "tinyloop";
           <p class="docs-section-label">Installation</p>
           <h2>Set up local auth.</h2>
           <p>
-            tinyloop can read <code>OPENAI_API_KEY</code>, but the recommended path for local learning is
-            <code>tinyloop auth login</code>. It stores the key in tinyloop's local auth file so each project does not
-            need its own <code>.env</code>.
+            tinyloop can use your ChatGPT subscription through Codex auth, or it can read <code>OPENAI_API_KEY</code>.
+            The recommended local path is <code>tinyloop auth login chatgpt</code>, which reuses your Codex login and
+            stores only tinyloop's provider preference locally.
           </p>
 
           <div class="docs-steps">
@@ -69,14 +70,14 @@ const startCommand = "tinyloop";
             <div class="docs-step">
               <span>02</span>
               <div>
-                <h3>Save your API key.</h3>
-                <p>The prompt hides the key while you type. Use <code>tinyloop auth path</code> to see the active file.</p>
+                <h3>Use ChatGPT auth.</h3>
+                <p>tinyloop reuses the local Codex login. Use <code>tinyloop auth codex-path</code> to see that file.</p>
                 <div class="docs-command" aria-label="tinyloop auth login command">
-                  <code>{loginCommand}</code>
+                  <code>{chatgptLoginCommand}</code>
                   <button
                     class="copy-icon-button"
                     type="button"
-                    data-copy-value={loginCommand}
+                    data-copy-value={chatgptLoginCommand}
                     aria-label="Copy auth login command"
                     title="Copy"
                   >
@@ -90,10 +91,31 @@ const startCommand = "tinyloop";
             <div class="docs-step">
               <span>03</span>
               <div>
+                <h3>Or save an API key.</h3>
+                <p>The prompt hides the key while you type. Use <code>tinyloop auth path</code> to see tinyloop's file.</p>
+                <div class="docs-command" aria-label="tinyloop API key auth login command">
+                  <code>{apiKeyLoginCommand}</code>
+                  <button
+                    class="copy-icon-button"
+                    type="button"
+                    data-copy-value={apiKeyLoginCommand}
+                    aria-label="Copy API key auth login command"
+                    title="Copy"
+                  >
+                    <Copy class="copy-icon copy-icon-copy" size={15} stroke-width={2} aria-hidden="true" />
+                    <Check class="copy-icon copy-icon-check" size={15} stroke-width={2.2} aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="docs-step">
+              <span>04</span>
+              <div>
                 <h3>Check and start.</h3>
                 <p>
-                  <code>OPENAI_API_KEY</code> still overrides stored auth. Otherwise tinyloop uses the saved key when
-                  you start a session.
+                  <code>OPENAI_API_KEY</code> still overrides stored auth. Otherwise tinyloop uses your selected local
+                  provider when you start a session.
                 </p>
                 <div class="docs-command-stack" aria-label="Auth status and start commands">
                   <div class="docs-command">
@@ -128,8 +150,9 @@ const startCommand = "tinyloop";
           </div>
 
           <p class="docs-note">
-            Stored auth defaults to <code>~/.tinyloop/auth.json</code>. Set <code>TINYLOOP_HOME</code> if you want
-            tinyloop to use a different local auth directory.
+            tinyloop's provider preference defaults to <code>~/.tinyloop/auth.json</code>. Codex ChatGPT auth defaults
+            to <code>~/.codex/auth.json</code>. Set <code>TINYLOOP_HOME</code> or <code>CODEX_HOME</code> to use a
+            different local auth directory.
           </p>
         </section>
 

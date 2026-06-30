@@ -31,7 +31,7 @@
     "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
     "build": "pnpm clean && tsc",
     "start": "tsx src/main.ts",
-    "test": "pnpm typecheck",
+    "test": "pnpm typecheck && tsx test/agent-streaming.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

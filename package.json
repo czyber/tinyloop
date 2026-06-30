@@ -15,7 +15,7 @@
     "lint:fix": "biome lint --write .",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
-    "pack:check": "pnpm build && pnpm --filter tinyloop-agent pack --dry-run && pnpm --filter tinyloop pack --dry-run"
+    "pack:check": "pnpm build && pnpm --filter tinyloop-agent pack --dry-run && pnpm --filter tinyloop-tui pack --dry-run && pnpm --filter tinyloop pack --dry-run"
   },
   "keywords": [
     "agent",

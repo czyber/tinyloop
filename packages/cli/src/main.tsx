@@ -5,14 +5,18 @@ import { dirname, join, parse } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as dotenv from "dotenv";
 import { render } from "ink";
-import { promptForMissingOpenAIAuth, runAuthCommand } from "./auth/auth-cli.js";
-import { resolveOpenAIAuth } from "./auth/auth-store.js";
-import { App } from "./components/app.js";
+import { App, createDemoSessionDriver } from "tinyloop-tui";
+import { promptForMissingAuth, runAuthCommand } from "./auth/auth-cli.js";
+import { type ResolvedAuth, resolveAuth } from "./auth/auth-store.js";
 import { createAgentSessionDriver } from "./session/agent-session-driver.js";
-import { createDemoSessionDriver } from "./session/demo-session-driver.js";
 
 async function main(): Promise<void> {
-  const args = process.argv.slice(2);
+  const args = normalizeArgs(process.argv.slice(2));
+
+  if (args[0] === "auth") {
+    await runAuthCommand(args.slice(1));
+    return;
+  }
 
   if (hasFlag(args, "--help") || hasFlag(args, "-h")) {
     printHelp();
@@ -21,11 +25,6 @@ async function main(): Promise<void> {
 
   if (hasFlag(args, "--version") || hasFlag(args, "-v")) {
     console.log(readPackageVersion());
-    return;
-  }
-
-  if (args[0] === "auth") {
-    await runAuthCommand(args.slice(1));
     return;
   }
 
@@ -40,11 +39,55 @@ async function main(): Promise<void> {
   render(<App mode={isDemoMode ? "demo" : "agent"} sessionDriver={sessionDriver} />);
 }
 
-async function resolveAgentOptions(): Promise<{ apiKey: string; model?: string }> {
-  const auth = (await resolveOpenAIAuth()) ?? (await promptForMissingOpenAIAuth());
+function normalizeArgs(args: string[]): string[] {
+  return args[0] === "--" ? args.slice(1) : args;
+}
+
+async function resolveAgentOptions(): Promise<{
+  apiKey: string;
+  model?: string;
+  baseURL?: string;
+  defaultHeaders?: Record<string, string>;
+  streamResponses?: boolean;
+  storeResponses?: boolean;
+  usePreviousResponseId?: boolean;
+}> {
+  const auth = (await resolveAuth()) ?? (await promptForMissingAuth());
+  return toAgentOptions(auth);
+}
+
+function toAgentOptions(auth: ResolvedAuth): {
+  apiKey: string;
+  model?: string;
+  baseURL?: string;
+  defaultHeaders?: Record<string, string>;
+  streamResponses?: boolean;
+  storeResponses?: boolean;
+  usePreviousResponseId?: boolean;
+} {
+  if (auth.type === "openai-api-key") {
+    return {
+      apiKey: auth.apiKey,
+      model: auth.model,
+    };
+  }
+
+  const defaultHeaders: Record<string, string> = {
+    "ChatGPT-Account-ID": auth.accountId,
+    "OAI-Product-Sku": "codex",
+  };
+  if (auth.isFedrampAccount) {
+    defaultHeaders["X-OpenAI-Fedramp"] = "true";
+  }
+
   return {
-    apiKey: auth.apiKey,
+    apiKey: auth.accessToken,
     model: auth.model,
+    baseURL: auth.baseURL,
+    defaultHeaders,
+    streamResponses: true,
+    storeResponses: false,
+    usePreviousResponseId: false,
   };
 }
 
@@ -72,6 +115,8 @@ Usage:
   tinyloop                 Start the coding agent in the current workspace
   tinyloop --demo          Start demo mode without an API key
   tinyloop auth login      Save an OpenAI API key locally
+  tinyloop auth login chatgpt
+                           Use a local Codex ChatGPT login
   tinyloop auth status     Show whether auth is configured
   tinyloop auth logout     Remove stored auth
 
@@ -81,7 +126,7 @@ Options:
 
 Auth:
   OPENAI_API_KEY overrides stored auth.
-  Run \`tinyloop auth login\` once to avoid project .env files.`);
+  Run \`tinyloop auth login chatgpt\` to use ChatGPT subscription auth via Codex.`);
 }
 
 function hasFlag(args: string[], shortOrLongFlag: string): boolean {

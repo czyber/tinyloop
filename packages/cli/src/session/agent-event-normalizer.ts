@@ -1,6 +1,5 @@
 import type { AgentEvent } from "tinyloop-agent";
-
-import type { UiSessionEvent, UiSessionEventMeta } from "./session-driver.js";
+import type { UiSessionEvent, UiSessionEventMeta } from "tinyloop-tui";
 
 export function toUiSessionEvent(event: AgentEvent): UiSessionEvent {
   const meta = toUiSessionEventMeta(event);

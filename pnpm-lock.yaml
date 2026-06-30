@@ -80,14 +80,39 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
 
+  packages/cli:
+    dependencies:
+      dotenv:
+        specifier: ^17.4.2
+        version: 17.4.2
+      ink:
+        specifier: ^5.0.0
+        version: 5.2.1(@types/react@18.3.31)(react@18.3.1)
+      react:
+        specifier: ^18.0.0
+        version: 18.3.1
+      tinyloop-agent:
+        specifier: workspace:^
+        version: link:../agent
+      tinyloop-tui:
+        specifier: workspace:^
+        version: link:../tui
+    devDependencies:
+      '@types/react':
+        specifier: ^18.0.0
+        version: 18.3.31
+      tsx:
+        specifier: ^4.0.0
+        version: 4.22.4
+      typescript:
+        specifier: ^6.0.0
+        version: 6.0.3
+
   packages/tui:
     dependencies:
       cli-highlight:
         specifier: 2.1.11
         version: 2.1.11
-      dotenv:
-        specifier: ^17.4.2
-        version: 17.4.2
       ink:
         specifier: ^5.0.0
         version: 5.2.1(@types/react@18.3.31)(react@18.3.1)
@@ -103,9 +128,6 @@ importers:
       react:
         specifier: ^18.0.0
         version: 18.3.1
-      tinyloop-agent:
-        specifier: workspace:^
-        version: link:../agent
     devDependencies:
       '@types/react':
         specifier: ^18.0.0
