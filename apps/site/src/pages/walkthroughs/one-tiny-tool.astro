@@ -41,6 +41,19 @@ export function createListFilesTool(workspaceRoot: string): ToolHandler<ListFile
   }
 }`;
 
+const outputDetailsCode = `const entries = await readdir(directory)
+
+return {
+  // The model sees this string.
+  output: entries.join("\\n"),
+
+  // The UI can use this structured data.
+  details: {
+    path,
+    entries
+  }
+}`;
+
 const registryCode = `const tools = createDefaultTools(workspaceRoot)
 const definitions = toolDefinitions(tools)
 
@@ -60,6 +73,19 @@ export function createDefaultTools(workspaceRoot: string): ToolMap {
   }
 }`;
 
+const handlerCallCode = `const tool = tools[toolCall.name]
+const args = parseToolArgs(toolCall.arguments)
+const result = await tool.run(args, context)
+
+return {
+  output: {
+    type: "function_call_output",
+    call_id: toolCall.call_id,
+    output: result.output
+  },
+  result
+}`;
+
 const eventCode = `export type ToolDetailsByName = {
   read_file: ReadFileToolDetails
   write_file: WriteFileToolDetails
@@ -67,6 +93,23 @@ const eventCode = `export type ToolDetailsByName = {
   run_command: RunCommandLineToolDetails
   list_files: ListFilesToolDetails
 }`;
+
+const finishedEventCode = `case "list_files":
+  return {
+    type: "tool.execution.finished",
+    name,
+    callId,
+    output,
+    details: details as ListFilesToolDetails
+  }`;
+
+const reducerDetailsCode = `case "tool.finished":
+  updateToolItem(turn, event.callId, (tool) => ({
+    ...tool,
+    status: "completed",
+    output: tool.output.length > 0 ? tool.output : event.output,
+    details: event.details
+  }))`;
 ---
 
 <BaseLayout
@@ -96,6 +139,12 @@ const eventCode = `export type ToolDetailsByName = {
       </div>
 
       <CodeFrame title="packages/agent/src/tools/list-files.ts" caption="small read-only example" code={toolCode} />
+      <p class="section-copy">
+        The return value has a deliberate split. <code>output</code> is the plain text the model receives in the next
+        turn. <code>details</code> is structured data for tinyloop's own UI; it can make rendering nicer without adding
+        extra noise to the model's context.
+      </p>
+      <CodeFrame title="packages/agent/src/tools/list-files.ts" caption="model output vs UI details" code={outputDetailsCode} />
     </section>
 
     <section class="section page-shell narrative-section">
@@ -114,6 +163,19 @@ const eventCode = `export type ToolDetailsByName = {
 
     <section class="section page-shell narrative-section">
       <div class="section-header" data-motion>
+        <p class="section-kicker">Call handling</p>
+        <h2 class="section-title">The model's JSON arguments become local input.</h2>
+        <p class="section-copy">
+          A tool call arrives as a name, call ID, and JSON string. tinyloop looks up the handler, parses the arguments,
+          runs local TypeScript, then wraps the result as a <code>function_call_output</code> for the next model turn.
+        </p>
+      </div>
+
+      <CodeFrame title="packages/agent/src/tools/registry.ts" caption="from model call to local handler" code={handlerCallCode} />
+    </section>
+
+    <section class="section page-shell narrative-section">
+      <div class="section-header" data-motion>
         <p class="section-kicker">Type boundary</p>
         <h2 class="section-title">Details should become part of the event contract.</h2>
         <p class="section-copy">
@@ -123,6 +185,13 @@ const eventCode = `export type ToolDetailsByName = {
       </div>
 
       <CodeFrame title="packages/agent/src/tools/registry.ts" caption="details by tool name" code={eventCode} />
+      <CodeFrame title="packages/agent/src/agent.ts" caption="emitting typed details for the UI" code={finishedEventCode} />
+      <p class="section-copy">
+        On the TUI side, the finished event updates the tool item that was already created when the tool started. The
+        reducer keeps any streamed output, falls back to the final output when needed, and stores <code>details</code>
+        so the renderer can choose a richer display.
+      </p>
+      <CodeFrame title="packages/tui/src/state/reduce-session-event.ts" caption="details land in transcript state" code={reducerDetailsCode} />
     </section>
 
     <section class="section page-shell narrative-section">

@@ -26,6 +26,48 @@ const agentLoopCode = `for (let turn = 0; turn < maxToolTurns; turn += 1) {
   input = await runToolCalls(tools, toolCalls, { emit })
 }`;
 
+const modelRequestCode = `private async createResponse(input) {
+  const request = {
+    model: this.model,
+    input,
+    tools: this.toolDefinitions,
+    previous_response_id: this.previousResponseId,
+    store: this.storeResponses
+  }
+
+  return this.client.responses.create(request)
+}`;
+
+const toolRunCode = `for (const toolCall of toolCalls) {
+  emit({
+    type: "tool.execution.started",
+    name: toolCall.name,
+    callId: toolCall.call_id,
+    args: toolCall.arguments
+  })
+
+  const execution = await handleToolCall(tools, toolCall, { emit })
+
+  toolOutputs.push(execution.output)
+  emit({
+    type: "tool.execution.finished",
+    name: toolCall.name,
+    callId: toolCall.call_id,
+    output: execution.result.output,
+    details: execution.result.details
+  })
+}`;
+
+const normalizerCode = `case "tool.execution.finished":
+  return {
+    ...meta,
+    type: "tool.finished",
+    callId: event.callId,
+    name: event.name,
+    output: event.output,
+    details: event.details
+  }`;
+
 const reducerCode = `event -> reduceSessionEvent(state, event) -> TuiState
 
 turn.started       creates a running turn
@@ -34,6 +76,25 @@ tool.started       appends a running tool item
 tool.progress      appends streamed stdout
 tool.finished      completes the tool item
 assistant.message  appends the final response`;
+
+const reducerStartedCode = `case "tool.started":
+  items: [...turn.items, {
+    type: "tool",
+    callId: event.callId,
+    name: event.name,
+    status: "running",
+    args: event.args,
+    output: "",
+    sequence: event.sequence
+  }]`;
+
+const reducerFinishedCode = `case "tool.finished":
+  updateToolItem(turn, event.callId, (tool) => ({
+    ...tool,
+    status: "completed",
+    output: tool.output.length > 0 ? tool.output : event.output,
+    details: event.details
+  }))`;
 ---
 
 <BaseLayout
@@ -80,6 +141,33 @@ assistant.message  appends the final response`;
 
     <section class="section page-shell narrative-section">
       <div class="section-header" data-motion>
+        <p class="section-kicker">Model request</p>
+        <h2 class="section-title">The tools are part of the request.</h2>
+        <p class="section-copy">
+          The model does not discover tools by reading local code. tinyloop builds function definitions from the tool map
+          and passes them with each model request. That is the point where local capabilities become model-visible
+          choices.
+        </p>
+      </div>
+
+      <CodeFrame title="packages/agent/src/agent.ts" caption="what the model receives" code={modelRequestCode} />
+    </section>
+
+    <section class="section page-shell narrative-section">
+      <div class="section-header" data-motion>
+        <p class="section-kicker">Tool execution</p>
+        <h2 class="section-title">A function call becomes two event edges.</h2>
+        <p class="section-copy">
+          tinyloop emits before and after the local handler runs. The model receives the string output. The UI receives
+          the same completion event plus optional details for rendering.
+        </p>
+      </div>
+
+      <CodeFrame title="packages/agent/src/agent.ts" caption="start, run, finish" code={toolRunCode} />
+    </section>
+
+    <section class="section page-shell narrative-section">
+      <div class="section-header" data-motion>
         <p class="section-kicker">Event trace</p>
         <h2 class="section-title">The hidden work becomes a visible sequence.</h2>
         <p class="section-copy">
@@ -120,6 +208,12 @@ assistant.message  appends the final response`;
           <p>Final model text becomes another transcript item.</p>
         </li>
       </ol>
+
+      <CodeFrame
+        title="packages/cli/src/session/agent-event-normalizer.ts"
+        caption="agent event to UI event"
+        code={normalizerCode}
+      />
     </section>
 
     <section class="section page-shell narrative-section">
@@ -133,6 +227,18 @@ assistant.message  appends the final response`;
       </div>
 
       <CodeFrame title="packages/tui/src/state/reduce-session-event.ts" caption="event shape becomes UI state" code={reducerCode} />
+      <p class="section-copy">
+        When a tool starts, the reducer creates a placeholder transcript item. The important field is
+        <code>callId</code>: later progress and finish events use it to find this exact row. <code>output</code> starts
+        empty because streamed progress may arrive before the tool is complete.
+      </p>
+      <CodeFrame title="packages/tui/src/state/reduce-session-event.ts" caption="creating the tool row" code={reducerStartedCode} />
+      <p class="section-copy">
+        When the tool finishes, the reducer does not append a second tool. It updates the existing one with the same
+        <code>callId</code>, marks it completed, preserves streamed output when it exists, and stores structured details
+        for the renderer.
+      </p>
+      <CodeFrame title="packages/tui/src/state/reduce-session-event.ts" caption="completing the tool row" code={reducerFinishedCode} />
     </section>
 
     <section class="section-compact page-shell">
