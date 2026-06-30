@@ -1233,3 +1233,33 @@
 {"message":"/src/styles/global.css","label":"watch","level":"info"}
 {"message":"[200] /docs/installation/ 26ms","label":null,"level":"info"}
 {"message":"[200] /docs/installation/ 45ms","label":null,"level":"info"}
+{"message":"[200] / 45ms","label":null,"level":"info"}
+{"message":"[200] /principles/ 53ms","label":null,"level":"info"}
+{"message":"[200] /architecture/ 57ms","label":null,"level":"info"}
+{"message":"/src/styles/global.css","label":"watch","level":"info"}
+{"message":"/src/styles/global.css","label":"watch","level":"info"}
+{"message":"[200] /architecture/ 23ms","label":null,"level":"info"}
+{"message":"[200] /docs/installation/ 43ms","label":null,"level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"[200] /architecture/ 62ms","label":null,"level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"[200] /architecture/ 52ms","label":null,"level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"[200] /architecture/ 15ms","label":null,"level":"info"}
+{"message":"[200] /docs/installation/ 19ms","label":null,"level":"info"}
+{"message":"[200] /docs/installation/ 36ms","label":null,"level":"info"}
+{"message":"/src/styles/global.css","label":"watch","level":"info"}
+{"message":"[200] /docs/installation/ 43ms","label":null,"level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"[200] /docs/installation/ 14ms","label":null,"level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"[200] /docs/installation/ 44ms","label":null,"level":"info"}
+{"message":"[200] / 42ms","label":null,"level":"info"}
+{"message":"[200] /principles/ 52ms","label":null,"level":"info"}
+{"message":"[200] /docs/installation/ 38ms","label":null,"level":"info"}
+{"message":"[200] /principles/ 35ms","label":null,"level":"info"}
+{"message":"[200] /architecture/ 41ms","label":null,"level":"info"}
+{"message":"[200] / 39ms","label":null,"level":"info"}
