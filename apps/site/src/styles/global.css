@@ -663,6 +663,33 @@ a {
   white-space: nowrap;
 }
 
+.hero-note {
+  max-width: 500px;
+  margin: 0.72rem 0 0;
+  color: rgb(116 118 117 / 0.82);
+  font-family: var(--font-copy);
+  font-size: 0.9rem;
+  font-variation-settings: var(--font-copy-settings);
+  font-weight: var(--font-copy-weight);
+  line-height: 1.5;
+}
+
+.hero-note a {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-color: rgb(20 20 20 / 0.24);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  transition:
+    color var(--duration-fast) var(--ease-standard),
+    text-decoration-color var(--duration-fast) var(--ease-standard);
+}
+
+.hero-note a:hover {
+  color: var(--color-primary);
+  text-decoration-color: rgb(2 104 207 / 0.42);
+}
+
 .copy-icon-button {
   position: relative;
   display: inline-flex;

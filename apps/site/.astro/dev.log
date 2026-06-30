@@ -1177,3 +1177,59 @@
 {"message":"[200] /architecture/ 52ms","label":null,"level":"info"}
 {"message":"[200] / 43ms","label":null,"level":"info"}
 {"message":"[200] /docs/installation/ 37ms","label":null,"level":"info"}
+{"message":"[200] /docs/installation/ 42ms","label":null,"level":"info"}
+{"message":"src/layouts/BaseLayout.astro","label":"watch","level":"info"}
+{"message":"[200] /docs/installation/ 40ms","label":null,"level":"info"}
+{"message":"[200] / 61ms","label":null,"level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"[200] /docs/installation/ 16ms","label":null,"level":"info"}
+{"message":"[200] / 16ms","label":null,"level":"info"}
+{"message":"src/layouts/BaseLayout.astro","label":"watch","level":"info"}
+{"message":"[200] / 25ms","label":null,"level":"info"}
+{"message":"[200] /docs/installation/ 40ms","label":null,"level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"[200] / 32ms","label":null,"level":"info"}
+{"message":"[200] /docs/installation/ 48ms","label":null,"level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"[200] / 19ms","label":null,"level":"info"}
+{"message":"[200] /docs/installation/ 40ms","label":null,"level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"[200] / 67ms","label":null,"level":"info"}
+{"message":"[200] / 34ms","label":null,"level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"[200] / 49ms","label":null,"level":"info"}
+{"message":"[200] / 30ms","label":null,"level":"info"}
+{"message":"[200] /docs/installation/ 30ms","label":null,"level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"[200] / 76ms","label":null,"level":"info"}
+{"message":"[200] /docs/installation/ 76ms","label":null,"level":"info"}
+{"message":"[200] / 16ms","label":null,"level":"info"}
+{"message":"[200] /docs/installation/ 41ms","label":null,"level":"info"}
+{"message":"[200] / 18ms","label":null,"level":"info"}
+{"message":"[200] /docs/installation/ 24ms","label":null,"level":"info"}
+{"message":"[200] / 22ms","label":null,"level":"info"}
+{"message":"/src/styles/global.css","label":"watch","level":"info"}
+{"message":"[200] /docs/installation/ 30ms","label":null,"level":"info"}
+{"message":"[200] / 32ms","label":null,"level":"info"}
+{"message":"/src/styles/global.css","label":"watch","level":"info"}
+{"message":"/src/styles/global.css","label":"watch","level":"info"}
+{"message":"[200] / 22ms","label":null,"level":"info"}
+{"message":"[200] /docs/installation/ 25ms","label":null,"level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"program reload","label":"vite","level":"info"}
+{"message":"[200] /docs/installation/ 16ms","label":null,"level":"info"}
+{"message":"[200] /docs/installation/ 40ms","label":null,"level":"info"}
+{"message":"/src/styles/global.css","label":"watch","level":"info"}
+{"message":"[200] /docs/installation/ 23ms","label":null,"level":"info"}
+{"message":"[200] /docs/installation/ 35ms","label":null,"level":"info"}
+{"message":"/src/styles/global.css","label":"watch","level":"info"}
+{"message":"[200] /docs/installation/ 26ms","label":null,"level":"info"}
+{"message":"[200] /docs/installation/ 45ms","label":null,"level":"info"}
