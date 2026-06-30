@@ -1,5 +1,5 @@
 {
-  "name": "@tinyloop/agent",
+  "name": "tinyloop-agent",
   "version": "0.1.0",
   "description": "The tinyloop agent loop and default tools.",
   "main": "dist/index.js",
@@ -28,7 +28,8 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc",
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build": "pnpm clean && tsc",
     "start": "tsx src/main.ts",
     "test": "pnpm typecheck",
     "typecheck": "tsc --noEmit"

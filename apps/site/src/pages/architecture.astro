@@ -1,0 +1,178 @@
+---
+import AgentLoopDiagram from "../components/AgentLoopDiagram.astro";
+import CodeFrame from "../components/CodeFrame.astro";
+import EventBoundaryDiagram from "../components/EventBoundaryDiagram.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import ToolContractSurface from "../components/ToolContractSurface.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const agentLoopCode = `// One user message can take several model/tool turns.
+for (toolTurn = 0; toolTurn < maxToolTurns; toolTurn += 1) {
+  response = responses.create(input, toolDefinitions, previousResponseId)
+  toolCalls = response.output.filter(isToolCall)
+
+  if (toolCalls.length === 0) {
+    return response.output_text
+  }
+
+  input = runToolCalls(toolCalls)
+}`;
+
+const runCommandCode = `child.stdout.on("data", (chunk) => {
+  emit({
+    type: "tool.execution.progress",
+    name,
+    callId,
+    progress: chunk
+  })
+
+  stdout += chunk
+})`;
+
+const reducerCode = `case "tool.progress":
+  tool.output = tool.output + event.text
+
+case "tool.finished":
+  tool.status = "completed"
+  tool.details = event.details
+
+case "assistant.message":
+  transcript.push(event.text)`;
+---
+
+<BaseLayout
+  title="tinyloop architecture - learn a tiny coding agent"
+  description="A hands-on walkthrough of tinyloop's model loop, tool contracts, session events, and terminal UI boundary."
+>
+  <SiteHeader />
+
+  <main>
+    <section class="page-hero page-shell">
+      <p class="eyebrow">Architecture</p>
+      <h1>Trace the exact boundary between model, tools, events, and UI.</h1>
+      <p>
+        tinyloop is useful because the important agent mechanics are visible. A user message enters
+        <code>AgentSession</code>, <code>Agent</code> asks the model what to do, tools run locally only when requested,
+        and the terminal UI learns what happened from ordered events.
+      </p>
+    </section>
+
+    <div class="page-shell">
+      <AgentLoopDiagram />
+    </div>
+
+    <section class="section page-shell narrative-section">
+      <div class="section-header" data-motion>
+        <p class="section-kicker">Loop shape</p>
+        <h2 class="section-title">The core loop is deliberately plain.</h2>
+        <p class="section-copy">
+          The implementation in <code>packages/agent/src/agent.ts</code> is not an orchestration maze. It repeatedly asks
+          the model for output. If there are no function calls, the turn is done. If there are tool calls, tinyloop runs
+          them and feeds their outputs back into the next model request.
+        </p>
+      </div>
+
+      <CodeFrame title="packages/agent/src/agent.ts" caption="teaching sketch, not copied source" code={agentLoopCode} />
+    </section>
+
+    <section class="section page-shell narrative-section">
+      <div class="section-header" data-motion>
+        <p class="section-kicker">Turn trace</p>
+        <h2 class="section-title">A turn becomes a readable event sequence.</h2>
+        <p class="section-copy">
+          <code>AgentSession.dispatch</code> wraps each user request with a <code>turnId</code>, emits lifecycle events,
+          and lets the agent stream tool work back through the same event sink. This is where invisible agent work becomes
+          inspectable.
+        </p>
+      </div>
+
+      <ol class="event-sequence" data-motion aria-label="tinyloop turn event sequence">
+        <li data-motion-child>
+          <span>01</span>
+          <code>turn.started</code>
+          <p>A new turn ID is created before any model or tool work happens.</p>
+        </li>
+        <li data-motion-child>
+          <span>02</span>
+          <code>user.message</code>
+          <p>The user's text is emitted as a transcript event, not just passed privately to the model.</p>
+        </li>
+        <li data-motion-child>
+          <span>03</span>
+          <code>tool.execution.started</code>
+          <p>If the model returns a function call, tinyloop emits the tool name, call ID, and raw JSON args.</p>
+        </li>
+        <li data-motion-child>
+          <span>04</span>
+          <code>tool.execution.progress</code>
+          <p><code>run_command</code> streams stdout chunks while the process is still running.</p>
+        </li>
+        <li data-motion-child>
+          <span>05</span>
+          <code>tool.execution.finished</code>
+          <p>The tool returns model-readable output and UI-readable details.</p>
+        </li>
+        <li data-motion-child>
+          <span>06</span>
+          <code>assistant.message</code>
+          <p>When the model stops asking for tools, final text is emitted to the transcript.</p>
+        </li>
+      </ol>
+    </section>
+
+    <div class="page-shell">
+      <ToolContractSurface />
+    </div>
+
+    <section class="section page-shell narrative-section">
+      <div class="section-header" data-motion>
+        <p class="section-kicker">A concrete tool</p>
+        <h2 class="section-title">Tool progress is just another event.</h2>
+        <p class="section-copy">
+          <code>run_command</code> is the easiest tool to understand hands-on: it spawns a shell process in the workspace,
+          appends stdout as progress, then resolves with an exit code, stdout, and stderr.
+        </p>
+      </div>
+
+      <CodeFrame
+        title="packages/agent/src/tools/run-command.ts"
+        caption="why command output appears before completion"
+        code={runCommandCode}
+      />
+    </section>
+
+    <div class="page-shell">
+      <EventBoundaryDiagram />
+    </div>
+
+    <section class="section page-shell narrative-section">
+      <div class="section-header" data-motion>
+        <p class="section-kicker">Reducer</p>
+        <h2 class="section-title">The UI reacts to event shape, not tool code.</h2>
+        <p class="section-copy">
+          By the time events reach the TUI, they have already been normalized. The reducer only needs to know how a UI
+          event changes transcript state. That is why the same UI path works for the real agent, the demo driver, and the
+          fake driver used in tests.
+        </p>
+      </div>
+
+      <CodeFrame title="packages/tui/src/state/reduce-session-event.ts" caption="the important reducer cases" code={reducerCode} />
+    </section>
+
+    <section class="section-compact page-shell">
+      <div class="honesty-note" data-motion>
+        <p class="section-kicker">Boundary conditions</p>
+        <h2>What this architecture does not solve yet.</h2>
+        <p>
+          The file tools guard against paths escaping the workspace. <code>run_command</code> runs from the workspace,
+          but tinyloop does not currently implement approvals, cancellation, persistence, or command sandboxing. Those
+          are the natural next layers once the basic model/tool/event loop is clear.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer page-shell">
+    <span>Architecture grounded in the current tinyloop repository.</span>
+  </footer>
+</BaseLayout>

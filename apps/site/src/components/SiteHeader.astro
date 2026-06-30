@@ -1,0 +1,38 @@
+---
+import tuiPackage from "../../../../packages/tui/package.json";
+import TinyloopMark from "./TinyloopMark.astro";
+
+const { version } = tuiPackage;
+---
+
+<header class="site-header" data-floating="false">
+  <a class="brand-mark" href="/" aria-label="tinyloop home">
+    <TinyloopMark />
+    <span class="brand-name">tinyloop</span>
+    <span class="brand-version">v{version}</span>
+  </a>
+  <nav class="site-nav" aria-label="Primary">
+    <a href="/architecture/">Architecture</a>
+    <a href="/principles/">Principles</a>
+    <a href="/docs/installation/">Docs</a>
+    <a href="https://github.com/czyber/tinyloop">GitHub</a>
+  </nav>
+  <button
+    class="mobile-nav-toggle"
+    type="button"
+    aria-label="Open navigation"
+    aria-controls="mobile-nav"
+    aria-expanded="false"
+    data-mobile-nav-toggle
+  >
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile primary" aria-hidden="true" inert data-mobile-nav>
+    <a href="/architecture/">Architecture</a>
+    <a href="/principles/">Principles</a>
+    <a href="/docs/installation/">Docs</a>
+    <a href="https://github.com/czyber/tinyloop">GitHub</a>
+  </nav>
+</header>

@@ -1,0 +1,147 @@
+---
+import { Check, Copy } from "@lucide/astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const installCommand = "npm install -g tinyloop";
+const loginCommand = "tinyloop auth login";
+const statusCommand = "tinyloop auth status";
+const startCommand = "tinyloop";
+---
+
+<BaseLayout
+  title="Installation - tinyloop docs"
+  description="Install tinyloop, save an OpenAI API key locally, and start the educational coding agent from a workspace."
+>
+  <SiteHeader />
+
+  <main class="docs-page">
+    <div class="docs-layout page-shell">
+      <aside class="docs-sidebar" aria-label="Documentation navigation">
+        <a class="docs-home" href="/docs/installation/">tinyloop docs</a>
+        <nav class="docs-nav">
+          <span>Docs</span>
+          <a href="/docs/installation/" aria-current="page">Installation</a>
+        </nav>
+      </aside>
+
+      <article class="docs-main">
+        <header class="docs-header">
+          <p class="section-kicker">Documentation</p>
+          <h1>Installation</h1>
+          <p>
+            Install the CLI, save your OpenAI API key once, then launch tinyloop from the workspace you want it to
+            inspect.
+          </p>
+        </header>
+
+        <section class="docs-section" id="setup">
+          <p class="docs-section-label">Installation</p>
+          <h2>Set up local auth.</h2>
+          <p>
+            tinyloop can read <code>OPENAI_API_KEY</code>, but the recommended path for local learning is
+            <code>tinyloop auth login</code>. It stores the key in tinyloop's local auth file so each project does not
+            need its own <code>.env</code>.
+          </p>
+
+          <div class="docs-steps">
+            <div class="docs-step">
+              <span>01</span>
+              <div>
+                <h3>Install the CLI.</h3>
+                <p>Install tinyloop globally so the command is available inside any workspace.</p>
+                <div class="docs-command" aria-label="Install tinyloop command">
+                  <code>{installCommand}</code>
+                  <button
+                    class="copy-icon-button"
+                    type="button"
+                    data-copy-value={installCommand}
+                    aria-label="Copy install command"
+                    title="Copy"
+                  >
+                    <Copy class="copy-icon copy-icon-copy" size={15} stroke-width={2} aria-hidden="true" />
+                    <Check class="copy-icon copy-icon-check" size={15} stroke-width={2.2} aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="docs-step">
+              <span>02</span>
+              <div>
+                <h3>Save your API key.</h3>
+                <p>The prompt hides the key while you type. Use <code>tinyloop auth path</code> to see the active file.</p>
+                <div class="docs-command" aria-label="tinyloop auth login command">
+                  <code>{loginCommand}</code>
+                  <button
+                    class="copy-icon-button"
+                    type="button"
+                    data-copy-value={loginCommand}
+                    aria-label="Copy auth login command"
+                    title="Copy"
+                  >
+                    <Copy class="copy-icon copy-icon-copy" size={15} stroke-width={2} aria-hidden="true" />
+                    <Check class="copy-icon copy-icon-check" size={15} stroke-width={2.2} aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="docs-step">
+              <span>03</span>
+              <div>
+                <h3>Check and start.</h3>
+                <p>
+                  <code>OPENAI_API_KEY</code> still overrides stored auth. Otherwise tinyloop uses the saved key when
+                  you start a session.
+                </p>
+                <div class="docs-command-stack" aria-label="Auth status and start commands">
+                  <div class="docs-command">
+                    <code>{statusCommand}</code>
+                    <button
+                      class="copy-icon-button"
+                      type="button"
+                      data-copy-value={statusCommand}
+                      aria-label="Copy auth status command"
+                      title="Copy"
+                    >
+                      <Copy class="copy-icon copy-icon-copy" size={15} stroke-width={2} aria-hidden="true" />
+                      <Check class="copy-icon copy-icon-check" size={15} stroke-width={2.2} aria-hidden="true" />
+                    </button>
+                  </div>
+                  <div class="docs-command">
+                    <code>{startCommand}</code>
+                    <button
+                      class="copy-icon-button"
+                      type="button"
+                      data-copy-value={startCommand}
+                      aria-label="Copy start command"
+                      title="Copy"
+                    >
+                      <Copy class="copy-icon copy-icon-copy" size={15} stroke-width={2} aria-hidden="true" />
+                      <Check class="copy-icon copy-icon-check" size={15} stroke-width={2.2} aria-hidden="true" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="docs-note">
+            Stored auth defaults to <code>~/.tinyloop/auth.json</code>. Set <code>TINYLOOP_HOME</code> if you want
+            tinyloop to use a different local auth directory.
+          </p>
+        </section>
+      </article>
+
+      <aside class="docs-on-page" aria-label="On this page">
+        <span>On this page</span>
+        <a href="#setup">Set up local auth</a>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer page-shell">
+    <span>Installation docs for tinyloop.</span>
+  </footer>
+</BaseLayout>

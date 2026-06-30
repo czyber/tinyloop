@@ -1,4 +1,8 @@
 packages:
+  - "apps/*"
   - "packages/*"
 allowBuilds:
   esbuild: true
+  sharp: true
+minimumReleaseAgeExclude:
+  - '@lucide/astro@1.22.0'

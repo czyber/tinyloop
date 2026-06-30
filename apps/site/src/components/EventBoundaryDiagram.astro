@@ -1,0 +1,40 @@
+<section class="technical-diagram boundary-diagram" aria-labelledby="event-boundary-heading" data-motion data-diagram>
+  <div class="diagram-copy">
+    <p class="section-kicker">Event boundary</p>
+    <h2 id="event-boundary-heading">The UI receives facts, not agent internals.</h2>
+    <p>
+      <code>AgentSession</code> turns private work into ordered facts. The TUI normalizes those facts, reduces them into
+      state, and renders from state. This is the boundary that makes tinyloop easy to test and explain.
+    </p>
+  </div>
+
+  <div class="boundary-rail" aria-label="Agent event to UI state flow">
+    <div class="boundary-stage boundary-stage-source">
+      <span>01</span>
+      <strong>AgentEvent</strong>
+      <code>tool.execution.progress</code>
+      <p>Payload plus <code>sessionId</code>, <code>turnId</code>, and <code>sequence</code>.</p>
+    </div>
+    <div class="boundary-arrow" aria-hidden="true"></div>
+    <div class="boundary-stage">
+      <span>02</span>
+      <strong>toUiSessionEvent</strong>
+      <code>tool.progress</code>
+      <p>Names are made UI-friendly without exposing the agent package to components.</p>
+    </div>
+    <div class="boundary-arrow" aria-hidden="true"></div>
+    <div class="boundary-stage">
+      <span>03</span>
+      <strong>reduceSessionEvent</strong>
+      <code>tool.output += text</code>
+      <p>The reducer appends streamed output to the matching tool transcript item.</p>
+    </div>
+    <div class="boundary-arrow" aria-hidden="true"></div>
+    <div class="boundary-stage boundary-stage-target">
+      <span>04</span>
+      <strong>Ink transcript</strong>
+      <code>&lt;ToolCard /&gt;</code>
+      <p>The interface renders state. It does not run tools or call the model.</p>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,42 @@
+<section class="tool-contract" aria-labelledby="tool-contract-heading" data-motion>
+  <div class="section-header">
+    <p class="section-kicker">Tool contracts</p>
+    <h2 class="section-title" id="tool-contract-heading">Every tool has a model-facing schema and a local handler.</h2>
+    <p class="section-copy">
+      The important learning move is to separate what the model can ask for from what the runtime actually does.
+    </p>
+  </div>
+
+  <div class="contract-grid" role="table" aria-label="tinyloop default tools">
+    <div role="row" class="contract-row contract-head">
+      <span role="columnheader">tool</span>
+      <span role="columnheader">model can ask for</span>
+      <span role="columnheader">handler does</span>
+      <span role="columnheader">returns to loop</span>
+    </div>
+    <div role="row" class="contract-row">
+      <code role="cell">read_file</code>
+      <span role="cell"><code>path</code></span>
+      <span role="cell">Resolve inside the workspace and read UTF-8 text.</span>
+      <span role="cell">File contents plus path details.</span>
+    </div>
+    <div role="row" class="contract-row">
+      <code role="cell">write_file</code>
+      <span role="cell"><code>path</code>, <code>content</code></span>
+      <span role="cell">Create parent folders, write full contents, diff existing files.</span>
+      <span role="cell">Created message or unified diff.</span>
+    </div>
+    <div role="row" class="contract-row">
+      <code role="cell">edit_file</code>
+      <span role="cell"><code>path</code>, <code>oldSnippet</code>, <code>newSnippet</code></span>
+      <span role="cell">Replace exactly one occurrence, fail if missing or ambiguous.</span>
+      <span role="cell">Unified diff and edit details.</span>
+    </div>
+    <div role="row" class="contract-row">
+      <code role="cell">run_command</code>
+      <span role="cell"><code>command</code></span>
+      <span role="cell">Spawn a shell command from the workspace and stream stdout.</span>
+      <span role="cell">Exit code, stdout, stderr.</span>
+    </div>
+  </div>
+</section>

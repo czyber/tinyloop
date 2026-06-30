@@ -1,4 +1,4 @@
-import type { AgentEvent } from "@tinyloop/agent";
+import type { AgentEvent } from "tinyloop-agent";
 
 import type { UiSessionEvent, UiSessionEventMeta } from "./session-driver.js";
 

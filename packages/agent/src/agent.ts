@@ -68,7 +68,7 @@ export class Agent {
     const workspaceRoot = options.workspaceRoot ?? process.cwd();
     const tools = createDefaultTools(workspaceRoot);
 
-    this.client = options.client ?? new OpenAI();
+    this.client = options.client ?? new OpenAI({ apiKey: options.apiKey });
     this.model = options.model ?? process.env.OPENAI_MODEL ?? DEFAULT_MODEL;
     this.tools = tools;
     this.toolDefinitions = toolDefinitions(tools);
@@ -102,6 +102,7 @@ export class Agent {
 
 export type AgentOptions = {
   client?: OpenAI;
+  apiKey?: string;
   workspaceRoot?: string;
   model?: string;
   maxToolTurns?: number;

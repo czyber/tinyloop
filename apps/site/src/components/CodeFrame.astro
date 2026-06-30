@@ -1,0 +1,34 @@
+---
+import { Check, Copy } from "@lucide/astro";
+import { codeToHtml } from "shiki";
+
+type Props = {
+  title: string;
+  caption?: string;
+  code: string;
+  lang?: string;
+};
+
+const { title, caption, code, lang = "ts" } = Astro.props;
+const copyValue = code.trimEnd();
+const highlightedCode = (
+  await codeToHtml(copyValue, {
+    lang,
+    theme: "github-light",
+  })
+).replace("background-color:#fff;", "background-color:transparent;");
+---
+
+<figure class="code-frame" data-motion>
+  <figcaption>
+    <span class="code-frame-title">
+      <span>{title}</span>
+      {caption ? <em>{caption}</em> : null}
+    </span>
+    <button class="copy-icon-button" type="button" data-copy-value={copyValue} aria-label={`Copy ${title} snippet`} title="Copy">
+      <Copy class="copy-icon copy-icon-copy" size={15} stroke-width={2} aria-hidden="true" />
+      <Check class="copy-icon copy-icon-check" size={15} stroke-width={2.2} aria-hidden="true" />
+    </button>
+  </figcaption>
+  <div class="code-highlight" set:html={highlightedCode} />
+</figure>

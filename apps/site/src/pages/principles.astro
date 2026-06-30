@@ -1,0 +1,134 @@
+---
+import CodeFrame from "../components/CodeFrame.astro";
+import PrincipleTrace from "../components/PrincipleTrace.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const sessionDriverCode = `export type SessionDriver = {
+  sendUserMessage(text: string): Promise<void>
+  events(): AsyncIterable<UiSessionEvent>
+}`;
+---
+
+<BaseLayout
+  title="tinyloop principles - how the educational agent is shaped"
+  description="The design principles behind tinyloop: readable code, explicit events, small tool contracts, swappable drivers, and honest boundaries."
+>
+  <SiteHeader />
+
+  <main>
+    <section class="page-hero page-shell">
+      <p class="eyebrow">Principles</p>
+      <h1>tinyloop is designed to keep the agent understandable.</h1>
+      <p>
+        The point is not to look like a complete coding assistant. The point is to make the agent loop, tool boundary,
+        event stream, and UI reducer legible enough that a learner can change one part without losing the plot.
+      </p>
+    </section>
+
+    <div class="page-shell">
+      <PrincipleTrace />
+    </div>
+
+    <section class="section page-shell narrative-section">
+      <div class="principle-ledger" data-motion>
+        <div class="ledger-row" data-motion-child>
+          <span>01</span>
+          <h2>Readable before powerful.</h2>
+          <p>
+            tinyloop chooses a small model/tool loop over a feature-rich orchestration layer. That makes the cost visible:
+            learners can see where conversation state is carried with <code>previous_response_id</code>, where tool calls
+            are detected, and where the loop stops.
+          </p>
+        </div>
+        <div class="ledger-row" data-motion-child>
+          <span>02</span>
+          <h2>Contracts before convenience.</h2>
+          <p>
+            A tool is not a vague capability. It has a strict JSON schema, a handler, a string output for the model, and
+            optional details for the UI. This keeps the model boundary explicit.
+          </p>
+        </div>
+        <div class="ledger-row" data-motion-child>
+          <span>03</span>
+          <h2>Events before components.</h2>
+          <p>
+            The UI does not ask tools what happened. It consumes <code>UiSessionEvent</code> values. This is why
+            <code>createDemoSessionDriver</code> can teach the same interface without an API key.
+          </p>
+        </div>
+        <div class="ledger-row" data-motion-child>
+          <span>04</span>
+          <h2>Honesty before polish.</h2>
+          <p>
+            tinyloop names what it lacks: approvals, cancellation, persistence, and sandboxing. Those missing layers are
+            not swept under the rug; they become the next lessons.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section page-shell narrative-section">
+      <div class="section-header" data-motion>
+        <p class="section-kicker">A principle in code</p>
+        <h2 class="section-title">The session contract is intentionally tiny.</h2>
+        <p class="section-copy">
+          <code>SessionDriver</code> is the best example of tinyloop's design taste. It gives the UI exactly two moves:
+          send user text and listen for events.
+        </p>
+      </div>
+
+      <CodeFrame title="packages/tui/src/session/session-driver.ts" caption="the UI boundary" code={sessionDriverCode} />
+    </section>
+
+    <section class="section page-shell narrative-section">
+      <div class="section-header" data-motion>
+        <p class="section-kicker">Learning exercises</p>
+        <h2 class="section-title">Change one thing, then trace the consequences.</h2>
+        <p class="section-copy">
+          A good tinyloop exercise should make you predict the event flow before writing code. Then you can verify the
+          prediction in the reducer or the transcript.
+        </p>
+      </div>
+
+      <div class="exercise-steps" data-motion>
+        <div data-motion-child>
+          <span>tool</span>
+          <p>
+            Add a tool under <code>packages/agent/src/tools</code>. Then ask: what schema does the model see, and what
+            should the tool output say back to the model?
+          </p>
+        </div>
+        <div data-motion-child>
+          <span>event</span>
+          <p>
+            Add an event to <code>AgentEventPayload</code>. Then ask: does the TUI need a normalized event name or a new
+            reducer branch?
+          </p>
+        </div>
+        <div data-motion-child>
+          <span>render</span>
+          <p>
+            Change <code>ToolCard</code> rendering. Then ask: did you improve the transcript without making the UI call
+            agent internals?
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-compact page-shell">
+      <div class="honesty-note" data-motion>
+        <p class="section-kicker">North star</p>
+        <h2>The right abstraction is the one a learner can inspect.</h2>
+        <p>
+          tinyloop should grow by making the loop clearer: better auth, better installation, stronger tool boundaries,
+          more explicit events. If a feature hides the model/tool/session/UI relationship, it works against the project.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer page-shell">
+    <span>Principles for tinyloop as an educational coding agent.</span>
+  </footer>
+</BaseLayout>

@@ -1,0 +1,44 @@
+<section class="principle-trace" aria-labelledby="principle-trace-heading" data-motion>
+  <div class="section-header">
+    <p class="section-kicker">Principles in code</p>
+    <h2 class="section-title" id="principle-trace-heading">The rules are visible in the files.</h2>
+    <p class="section-copy">
+      Instead of abstract values, each principle maps to a place a learner can open and inspect.
+    </p>
+  </div>
+
+  <ol class="trace-lines">
+    <li>
+      <span>01</span>
+      <div>
+        <strong>Readable before powerful</strong>
+        <p><code>Agent.runOneUserTurn</code> is a direct model/tool loop with a small max-turn guard.</p>
+      </div>
+      <code>packages/agent/src/agent.ts</code>
+    </li>
+    <li>
+      <span>02</span>
+      <div>
+        <strong>Events are the public surface</strong>
+        <p><code>AgentEventPayload</code> names turn, message, tool, progress, completion, and failure moments.</p>
+      </div>
+      <code>packages/agent/src/event.ts</code>
+    </li>
+    <li>
+      <span>03</span>
+      <div>
+        <strong>Drivers keep the UI honest</strong>
+        <p><code>SessionDriver</code> exposes only <code>sendUserMessage</code> and <code>events</code>.</p>
+      </div>
+      <code>packages/tui/src/session/session-driver.ts</code>
+    </li>
+    <li>
+      <span>04</span>
+      <div>
+        <strong>State beats side effects</strong>
+        <p><code>reduceSessionEvent</code> is where streamed progress becomes transcript state.</p>
+      </div>
+      <code>packages/tui/src/state/reduce-session-event.ts</code>
+    </li>
+  </ol>
+</section>

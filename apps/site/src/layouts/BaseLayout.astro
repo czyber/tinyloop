@@ -1,0 +1,216 @@
+---
+import "../styles/global.css";
+
+type Props = {
+  title: string;
+  description: string;
+};
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f3f3f1" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+    <script>
+      import { animate, inView, stagger } from "motion";
+
+      const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const siteHeader = document.querySelector(".site-header");
+
+      if (siteHeader instanceof HTMLElement) {
+        const mobileNavToggle = siteHeader.querySelector("[data-mobile-nav-toggle]");
+        const mobileNav = siteHeader.querySelector("[data-mobile-nav]");
+
+        const updateHeader = () => {
+          siteHeader.dataset.floating = window.scrollY > 18 ? "true" : "false";
+        };
+
+        updateHeader();
+        window.addEventListener("scroll", updateHeader, { passive: true });
+
+        if (mobileNavToggle instanceof HTMLButtonElement && mobileNav instanceof HTMLElement) {
+          const setMenuOpen = (isOpen: boolean) => {
+            siteHeader.dataset.menuOpen = isOpen ? "true" : "false";
+            mobileNavToggle.setAttribute("aria-expanded", String(isOpen));
+            mobileNavToggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation");
+            mobileNav.setAttribute("aria-hidden", String(!isOpen));
+
+            if (isOpen) {
+              mobileNav.removeAttribute("inert");
+            } else {
+              mobileNav.setAttribute("inert", "");
+            }
+          };
+
+          setMenuOpen(false);
+
+          mobileNavToggle.addEventListener("click", () => {
+            setMenuOpen(siteHeader.dataset.menuOpen !== "true");
+          });
+
+          for (const link of mobileNav.querySelectorAll("a")) {
+            link.addEventListener("click", () => setMenuOpen(false));
+          }
+
+          document.addEventListener("click", (event) => {
+            if (siteHeader.dataset.menuOpen === "true" && event.target instanceof Node && !siteHeader.contains(event.target)) {
+              setMenuOpen(false);
+            }
+          });
+
+          window.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && siteHeader.dataset.menuOpen === "true") {
+              setMenuOpen(false);
+              mobileNavToggle.focus();
+            }
+          });
+
+          window.addEventListener("resize", () => {
+            if (window.innerWidth > 860) {
+              setMenuOpen(false);
+            }
+          });
+        }
+      }
+
+      function fallbackCopy(text: string) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.setAttribute("readonly", "");
+        textArea.style.position = "fixed";
+        textArea.style.inset = "0 auto auto 0";
+        textArea.style.opacity = "0";
+        document.body.append(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      async function copyText(text: string) {
+        if (!navigator.clipboard || !window.isSecureContext) {
+          fallbackCopy(text);
+          return;
+        }
+
+        await Promise.race([
+          navigator.clipboard.writeText(text),
+          new Promise((_, reject) => {
+            window.setTimeout(() => reject(new Error("Clipboard write timed out")), 600);
+          }),
+        ]);
+      }
+
+      for (const button of document.querySelectorAll<HTMLButtonElement>("[data-copy-code], [data-copy-value]")) {
+        const label = button.getAttribute("aria-label") ?? "Copy";
+        const title = button.getAttribute("title") ?? "Copy";
+
+        button.addEventListener("click", async () => {
+          const explicitValue = button.dataset.copyValue;
+          const frame = button.closest(".code-frame");
+          const codeLines = Array.from(frame?.querySelectorAll(".code-line") ?? []);
+          const frameValue =
+            codeLines.length > 0
+              ? codeLines.map((line) => line.textContent ?? "").join("\n")
+              : frame?.querySelector("code")?.textContent;
+          const value = (explicitValue ?? frameValue ?? "").replace(/^\n/, "").trimEnd();
+
+          if (!value) {
+            return;
+          }
+
+          try {
+            await copyText(value);
+          } catch {
+            fallbackCopy(value);
+          }
+
+          button.dataset.copied = "true";
+          button.setAttribute("aria-label", "Copied");
+          button.setAttribute("title", "Copied");
+
+          window.setTimeout(() => {
+            delete button.dataset.copied;
+            button.setAttribute("aria-label", label);
+            button.setAttribute("title", title);
+          }, 1400);
+        });
+      }
+
+      if (!mediaQuery.matches) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.setAttribute("data-revealed", "true");
+                observer.unobserve(entry.target);
+              }
+            }
+          },
+          { rootMargin: "0px 0px -12% 0px", threshold: 0.12 },
+        );
+
+        for (const element of document.querySelectorAll("[data-animate]")) {
+          observer.observe(element);
+        }
+      } else {
+        for (const element of document.querySelectorAll("[data-animate]")) {
+          element.setAttribute("data-revealed", "true");
+        }
+      }
+
+      const motionElements = document.querySelectorAll<HTMLElement>("[data-motion]");
+
+      if (!mediaQuery.matches) {
+        for (const element of motionElements) {
+          element.style.opacity = "0";
+          element.style.transform = "translateY(16px)";
+        }
+
+        inView(
+          "[data-motion]",
+          (element) => {
+            const htmlElement = element as HTMLElement;
+            htmlElement.dataset.motionActive = "true";
+            animate(
+              htmlElement,
+              { opacity: [0, 1], y: [16, 0] } as Record<string, unknown>,
+              { duration: 0.58, ease: [0.2, 0.8, 0.2, 1] },
+            );
+
+            const children = Array.from(htmlElement.querySelectorAll<HTMLElement>("[data-motion-child]"));
+            if (children.length > 0) {
+              animate(
+                children,
+                { opacity: [0, 1], y: [10, 0] } as Record<string, unknown>,
+                { delay: stagger(0.055), duration: 0.38, ease: [0.2, 0.8, 0.2, 1] },
+              );
+            }
+
+            const arrows = Array.from(htmlElement.querySelectorAll<HTMLElement>(".boundary-arrow"));
+            if (arrows.length > 0) {
+              animate(
+                arrows,
+                { opacity: [0.18, 1], scaleX: [0.18, 1] } as Record<string, unknown>,
+                { delay: stagger(0.12), duration: 0.48, ease: [0.2, 0.8, 0.2, 1] },
+              );
+            }
+          },
+          { margin: "0px 0px -14% 0px" },
+        );
+      } else {
+        for (const element of motionElements) {
+          element.dataset.motionActive = "true";
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,93 @@
+<section class="technical-diagram loop-diagram" aria-labelledby="agent-loop-heading" data-motion data-diagram>
+  <div class="diagram-copy">
+    <p class="section-kicker">Agent loop</p>
+    <h2 id="agent-loop-heading">The model is asked again only when tools ran.</h2>
+    <p>
+      <code>Agent.runOneUserTurn</code> is a small loop around the Responses API. A model response either ends the turn
+      with text, or asks tinyloop to run one or more local tools and send their outputs back as the next input.
+    </p>
+  </div>
+
+  <div class="loop-figure" aria-label="Agent loop diagram">
+    <svg class="loop-svg" viewBox="0 0 760 360" role="img" aria-labelledby="loop-title loop-desc">
+      <title id="loop-title">tinyloop agent loop</title>
+      <desc id="loop-desc">
+        User input is sent to the model, tool calls run locally, tool outputs return to the model, and final text exits.
+      </desc>
+      <defs>
+        <marker id="arrow-blue" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--color-primary)" />
+        </marker>
+        <marker id="arrow-orange" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--color-secondary)" />
+        </marker>
+      </defs>
+
+      <path class="flow-motion-path" id="flow-user-model" d="M161 91 H285" />
+      <path class="flow-motion-path" id="flow-model-output" d="M473 91 H599" />
+      <path class="flow-motion-path" id="flow-model-tools" d="M378 153 V214" />
+      <path class="flow-motion-path" id="flow-tools-model" d="M280 262 C211 262 211 170 285 126" />
+
+      <path class="diagram-line diagram-line-blue" d="M154 91 H292" marker-end="url(#arrow-blue)" />
+      <path class="diagram-line diagram-line-blue" d="M466 91 H606" marker-end="url(#arrow-blue)" />
+      <path class="diagram-line diagram-line-orange" d="M378 146 V221" marker-end="url(#arrow-orange)" />
+      <path class="diagram-line diagram-line-orange" d="M287 262 C202 262 202 169 292 126" marker-end="url(#arrow-orange)" />
+
+      <g class="diagram-node" transform="translate(22 52)">
+        <rect width="132" height="78" rx="7" />
+        <text x="18" y="32">user input</text>
+        <text x="18" y="54" class="muted">one turn</text>
+      </g>
+
+      <g class="diagram-node diagram-node-primary" transform="translate(292 36)">
+        <rect width="174" height="110" rx="7" />
+        <text x="18" y="33">responses.create</text>
+        <text x="18" y="57" class="muted">model + tools</text>
+        <text x="18" y="82" class="mono">previous_response_id</text>
+      </g>
+
+      <g class="diagram-node" transform="translate(606 52)">
+        <rect width="132" height="78" rx="7" />
+        <text x="18" y="32">output_text</text>
+        <text x="18" y="54" class="muted">turn returns</text>
+      </g>
+
+      <g class="diagram-node diagram-node-secondary" transform="translate(287 221)">
+        <rect width="182" height="92" rx="7" />
+        <text x="18" y="32">runToolCalls</text>
+        <text x="18" y="56" class="muted">local handlers</text>
+        <text x="18" y="75" class="mono">function_call_output</text>
+      </g>
+
+      <g class="flow-dots" aria-hidden="true">
+        <circle class="flow-dot flow-dot-blue" r="5">
+          <animateMotion dur="3.2s" repeatCount="indefinite">
+            <mpath href="#flow-user-model" />
+          </animateMotion>
+        </circle>
+        <circle class="flow-dot flow-dot-blue" r="5">
+          <animateMotion begin="1.2s" dur="3.2s" repeatCount="indefinite">
+            <mpath href="#flow-model-output" />
+          </animateMotion>
+        </circle>
+        <circle class="flow-dot flow-dot-orange" r="5">
+          <animateMotion begin="0.55s" dur="3.2s" repeatCount="indefinite">
+            <mpath href="#flow-model-tools" />
+          </animateMotion>
+        </circle>
+        <circle class="flow-dot flow-dot-orange" r="5">
+          <animateMotion begin="1.75s" dur="3.2s" repeatCount="indefinite">
+            <mpath href="#flow-tools-model" />
+          </animateMotion>
+        </circle>
+      </g>
+    </svg>
+
+    <ol class="loop-mobile-flow" aria-label="Agent loop diagram steps">
+      <li><span>input</span><strong>user input</strong><p>One message enters the turn.</p></li>
+      <li><span>model</span><strong>responses.create</strong><p>The model sees input plus tool definitions.</p></li>
+      <li><span>tools</span><strong>runToolCalls</strong><p>Local handlers run only if function calls were returned.</p></li>
+      <li><span>return</span><strong>output_text</strong><p>The turn ends once no more tool calls are needed.</p></li>
+    </ol>
+  </div>
+</section>

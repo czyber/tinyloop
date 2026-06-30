@@ -1,0 +1,446 @@
+---
+import { Check, Copy } from "@lucide/astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="tinyloop - a tiny coding agent you can read"
+  description="A tasteful showcase for tinyloop, a minimal educational coding agent with a tool loop, event stream, and terminal UI."
+>
+  <SiteHeader />
+
+  <main>
+    <section class="hero">
+      <div class="hero-canvas-stage" aria-hidden="true">
+        <canvas class="hero-canvas" data-hero-canvas></canvas>
+      </div>
+
+      <div class="page-shell">
+        <div class="hero-copy" data-animate data-revealed="true">
+          <p class="eyebrow">Educational coding agent</p>
+          <h1>tinyloop</h1>
+          <p class="hero-lede">
+            A small, readable agent loop for studying how model turns become tool calls, session events, and interface
+            state.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="/architecture/">Learn architecture</a>
+            <div class="hero-install-command" aria-label="Install command">
+              <code>npm install -g tinyloop</code>
+              <button
+                class="copy-icon-button"
+                type="button"
+                data-copy-value="npm install -g tinyloop"
+                aria-label="Copy install command"
+                title="Copy"
+              >
+                <Copy class="copy-icon copy-icon-copy" size={15} stroke-width={2} aria-hidden="true" />
+                <Check class="copy-icon copy-icon-check" size={15} stroke-width={2.2} aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section page-shell">
+      <div class="section-header" data-animate>
+        <p class="section-kicker">Overview</p>
+        <h2 class="section-title">A coding agent small enough to trace.</h2>
+        <p class="section-copy">
+          tinyloop is not trying to hide the machinery. It gives learners a concrete codebase where the model loop,
+          tool calls, session events, and terminal UI are separate enough to inspect one piece at a time.
+        </p>
+      </div>
+
+      <ol class="overview-rail" data-motion>
+        <li data-motion-child>
+          <span>01</span>
+          <strong>Model turn</strong>
+          <p>The model returns text or asks for a named function call.</p>
+        </li>
+        <li data-motion-child>
+          <span>02</span>
+          <strong>Local tool</strong>
+          <p>tinyloop runs <code>read_file</code>, <code>edit_file</code>, <code>write_file</code>, or <code>run_command</code>.</p>
+        </li>
+        <li data-motion-child>
+          <span>03</span>
+          <strong>Session event</strong>
+          <p>Tool progress, tool results, messages, and failures become ordered events.</p>
+        </li>
+        <li data-motion-child>
+          <span>04</span>
+          <strong>Transcript state</strong>
+          <p>The TUI reduces events into state and renders from that state.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="section page-shell">
+      <div class="section-header" data-animate>
+        <p class="section-kicker">Learning map</p>
+        <h2 class="section-title">Two deep dives, one codebase.</h2>
+        <p class="section-copy">
+          Start with the architecture if you want the mechanics. Read the principles if you want to understand why the
+          system is shaped this way.
+        </p>
+      </div>
+
+      <div class="learning-index" data-motion>
+        <article data-motion-child>
+          <span>Architecture</span>
+          <h3>Model loop, tools, events, reducer.</h3>
+          <p>
+            Walk through a tinyloop turn from user input to model response, tool execution, session events, UI state,
+            and terminal rendering.
+          </p>
+          <a class="button button-secondary" href="/architecture/">Open architecture</a>
+        </article>
+        <article data-motion-child>
+          <span>Principles</span>
+          <h3>Readable, eventful, honest.</h3>
+          <p>
+            tinyloop favors explicit contracts, swappable session drivers, visible state, and an honest boundary between
+            learning project and production agent.
+          </p>
+          <a class="button button-secondary" href="/principles/">Open principles</a>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-compact page-shell">
+      <div class="code-panel" data-animate>
+        <div class="code-notes">
+          <p class="section-kicker">The core boundary</p>
+          <h2>The UI learns from events, not internals.</h2>
+          <p>
+            This is the main architectural lesson in the repo. The agent package emits a session event stream; the TUI
+            package normalizes those events and reduces them into transcript state.
+          </p>
+        </div>
+        <div class="boundary-mini-figure" aria-label="tinyloop package boundary diagram">
+          <svg class="boundary-mini-svg" viewBox="0 0 820 260" role="img" aria-labelledby="boundary-mini-title">
+            <title id="boundary-mini-title">tinyloop package boundary</title>
+            <defs>
+              <marker
+                id="boundary-mini-arrow"
+                viewBox="0 0 10 10"
+                refX="7"
+                refY="5"
+                markerWidth="7"
+                markerHeight="7"
+                orient="auto"
+              >
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--color-primary)" />
+              </marker>
+            </defs>
+
+            <path class="flow-motion-path" id="boundary-flow-agent-driver" d="M190 111 H242" />
+            <path class="flow-motion-path" id="boundary-flow-driver-reducer" d="M392 111 H444" />
+            <path class="flow-motion-path" id="boundary-flow-reducer-ui" d="M624 111 H676" />
+
+            <path class="diagram-line diagram-line-blue" d="M190 111 H242" marker-end="url(#boundary-mini-arrow)" />
+            <path class="diagram-line diagram-line-blue" d="M392 111 H444" marker-end="url(#boundary-mini-arrow)" />
+            <path class="diagram-line diagram-line-blue" d="M624 111 H676" marker-end="url(#boundary-mini-arrow)" />
+
+            <g class="diagram-node diagram-node-primary" transform="translate(34 68)">
+              <rect width="156" height="86" rx="7" />
+              <text x="18" y="34">AgentSession</text>
+              <text x="18" y="58" class="muted">agent package</text>
+            </g>
+
+            <g class="diagram-node" transform="translate(242 68)">
+              <rect width="150" height="86" rx="7" />
+              <text x="18" y="34">SessionDriver</text>
+              <text x="18" y="58" class="muted">UI boundary</text>
+            </g>
+
+            <g class="diagram-node diagram-node-secondary" transform="translate(444 68)">
+              <rect width="180" height="86" rx="7" />
+              <text x="18" y="34">reduceSessionEvent</text>
+              <text x="18" y="58" class="muted">state transition</text>
+            </g>
+
+            <g class="diagram-node" transform="translate(676 68)">
+              <rect width="120" height="86" rx="7" />
+              <text x="18" y="34">Ink UI</text>
+              <text x="18" y="58" class="muted">transcript</text>
+            </g>
+
+            <g class="flow-dots" aria-hidden="true">
+              <circle class="flow-dot flow-dot-blue" r="5">
+                <animateMotion dur="2.8s" repeatCount="indefinite">
+                  <mpath href="#boundary-flow-agent-driver" />
+                </animateMotion>
+              </circle>
+              <circle class="flow-dot flow-dot-blue" r="5">
+                <animateMotion begin="0.45s" dur="2.8s" repeatCount="indefinite">
+                  <mpath href="#boundary-flow-driver-reducer" />
+                </animateMotion>
+              </circle>
+              <circle class="flow-dot flow-dot-blue" r="5">
+                <animateMotion begin="0.9s" dur="2.8s" repeatCount="indefinite">
+                  <mpath href="#boundary-flow-reducer-ui" />
+                </animateMotion>
+              </circle>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer page-shell">
+    <span>tinyloop is an educational coding agent by czyber.</span>
+  </footer>
+
+  <script is:inline>
+    const canvas = document.querySelector("[data-hero-canvas]");
+
+    if (canvas instanceof HTMLCanvasElement) {
+      const ctx = canvas.getContext("2d");
+      const stage = canvas.parentElement;
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+      if (ctx && stage) {
+        const colors = {
+          primary: "#0268cf",
+          secondary: "#e0770d",
+          ink: "#141414",
+          paper: "#f3f3f1",
+          surface: "#fbfbfa",
+          muted: "#747675",
+        };
+        const monoFont =
+          '"JetBrains Mono Variable", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace';
+        const sansFont =
+          '"Instrument Sans Variable", "Instrument Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+        const eventRows = [
+          { name: "turn.started", detail: "user intent", color: colors.primary },
+          { name: "model.delta", detail: "reasoning", color: colors.primary },
+          { name: "tool.call", detail: "bounded action", color: colors.secondary },
+          { name: "tool.result", detail: "output streamed", color: colors.secondary },
+          { name: "state.reduced", detail: "view updated", color: colors.primary },
+          { name: "assistant.message", detail: "response ready", color: colors.secondary },
+        ];
+        let width = 0;
+        let height = 0;
+        let dpr = 1;
+        let frame = 0;
+
+        function resize() {
+          const rect = stage.getBoundingClientRect();
+          dpr = Math.min(window.devicePixelRatio || 1, 2);
+          width = Math.max(320, rect.width);
+          height = Math.max(320, rect.height);
+          canvas.width = Math.floor(width * dpr);
+          canvas.height = Math.floor(height * dpr);
+          canvas.style.width = `${width}px`;
+          canvas.style.height = `${height}px`;
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        function alpha(hex, opacity) {
+          const value = hex.replace("#", "");
+          const r = parseInt(value.slice(0, 2), 16);
+          const g = parseInt(value.slice(2, 4), 16);
+          const b = parseInt(value.slice(4, 6), 16);
+          return `rgb(${r} ${g} ${b} / ${opacity})`;
+        }
+
+        function clamp(value, min, max) {
+          return Math.min(max, Math.max(min, value));
+        }
+
+        function getLayout() {
+          const compact = width < 520;
+          const scaleX = compact ? width * 0.34 : width * 0.29;
+          const scaleY = compact ? height * 0.2 : height * 0.23;
+          return {
+            compact,
+            cx: compact ? width * 0.5 : width * 0.61,
+            cy: compact ? height * 0.52 : height * 0.5,
+            scaleX,
+            scaleY,
+          };
+        }
+
+        function pointAt(t, layout) {
+          const angle = t * Math.PI * 2;
+          return {
+            x: layout.cx + layout.scaleX * Math.sin(angle),
+            y: layout.cy + layout.scaleY * Math.sin(angle) * Math.cos(angle),
+          };
+        }
+
+        function path(layout) {
+          ctx.beginPath();
+          for (let i = 0; i <= 260; i += 1) {
+            const point = pointAt(i / 260, layout);
+            if (i === 0) {
+              ctx.moveTo(point.x, point.y);
+            } else {
+              ctx.lineTo(point.x, point.y);
+            }
+          }
+        }
+
+        function drawInfinityPath(layout) {
+          ctx.save();
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+
+          path(layout);
+          ctx.strokeStyle = alpha(colors.ink, 0.18);
+          ctx.lineWidth = 1.25;
+          ctx.stroke();
+
+          path(layout);
+          const gradient = ctx.createLinearGradient(
+            layout.cx - layout.scaleX,
+            layout.cy,
+            layout.cx + layout.scaleX,
+            layout.cy,
+          );
+          gradient.addColorStop(0, alpha(colors.primary, 0.42));
+          gradient.addColorStop(0.48, alpha(colors.ink, 0.1));
+          gradient.addColorStop(1, alpha(colors.secondary, 0.48));
+          ctx.strokeStyle = gradient;
+          ctx.lineWidth = layout.compact ? 2 : 2.4;
+          ctx.stroke();
+
+          ctx.restore();
+        }
+
+        function drawTrail(layout, progress, color, length = 0.12) {
+          ctx.save();
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+
+          let previous = pointAt((progress - length + 1) % 1, layout);
+          for (let i = 1; i <= 36; i += 1) {
+            const amount = i / 36;
+            const t = (progress - length + amount * length + 1) % 1;
+            const point = pointAt(t, layout);
+            ctx.strokeStyle = alpha(color, 0.08 + amount * 0.34);
+            ctx.lineWidth = 1.2 + amount * (layout.compact ? 2.4 : 3.2);
+            ctx.beginPath();
+            ctx.moveTo(previous.x, previous.y);
+            ctx.lineTo(point.x, point.y);
+            ctx.stroke();
+            previous = point;
+          }
+
+          ctx.restore();
+        }
+
+        function drawOrb(layout, progress, color, size = 5.6) {
+          const point = pointAt(progress, layout);
+
+          ctx.fillStyle = alpha(color, 0.95);
+          ctx.strokeStyle = alpha(colors.paper, 0.88);
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+        }
+
+        function drawEventStack(layout, elapsed) {
+          const visibleCount = layout.compact ? 3 : 4;
+          const rowHeight = layout.compact ? 34 : 38;
+          const rowGap = 6;
+          const rowStep = rowHeight + rowGap;
+          const stackWidth = layout.compact ? Math.min(width - 36, 304) : 324;
+          const stackHeight = visibleCount * rowHeight + (visibleCount - 1) * rowGap;
+          const stackX = clamp(layout.cx - stackWidth / 2, 12, width - stackWidth - 12);
+          const stackY = clamp(
+            layout.cy + layout.scaleY * 0.58 + (layout.compact ? 30 : 42),
+            12,
+            height - stackHeight - 12,
+          );
+          const interval = 1.18;
+          const tick = elapsed / interval;
+          const current = Math.floor(tick) % eventRows.length;
+          const phase = tick - Math.floor(tick);
+          const phaseIn = phase < 0.18 ? phase / 0.18 : 1;
+          const oldestFade = phase > 0.72 ? 1 - (phase - 0.72) / 0.28 : 1;
+
+          ctx.save();
+          ctx.textAlign = "left";
+          ctx.textBaseline = "alphabetic";
+
+          for (let row = visibleCount - 1; row >= 0; row -= 1) {
+            const event = eventRows[(current - row + eventRows.length) % eventRows.length];
+            const rowIn = row === 0 ? phaseIn : 1;
+            const rowOut = row === visibleCount - 1 ? oldestFade : 1;
+            const opacity = (1 - row * 0.13) * rowIn * rowOut;
+            const y = stackY + row * rowStep - (row === 0 ? (1 - phaseIn) * 7 : 0);
+
+            ctx.globalAlpha = opacity;
+            ctx.fillStyle = alpha(colors.surface, 0.72);
+            ctx.strokeStyle = alpha(colors.ink, 0.11);
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.roundRect(stackX, y, stackWidth, rowHeight, 7);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = alpha(event.color, 0.9);
+            ctx.beginPath();
+            ctx.arc(stackX + 16, y + rowHeight / 2, 3.6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = colors.ink;
+            ctx.font = `700 ${layout.compact ? 10 : 11}px ${monoFont}`;
+            ctx.fillText(event.name, stackX + 30, y + (layout.compact ? 14 : 16));
+            ctx.fillStyle = colors.muted;
+            ctx.font = `600 ${layout.compact ? 10 : 11}px ${sansFont}`;
+            ctx.fillText(event.detail, stackX + 30, y + (layout.compact ? 27 : 30));
+          }
+
+          ctx.globalAlpha = 1;
+
+          ctx.restore();
+        }
+
+        function draw(now) {
+          const elapsed = reduceMotion.matches ? 2.8 : now / 1000;
+          const progress = (elapsed / 9.5) % 1;
+          const layout = getLayout();
+          ctx.clearRect(0, 0, width, height);
+
+          drawInfinityPath(layout);
+          drawTrail(layout, progress, colors.primary, 0.12);
+          drawTrail(layout, (progress + 0.5) % 1, colors.secondary, 0.1);
+          drawTrail(layout, (progress + 0.28) % 1, colors.primary, 0.07);
+          drawOrb(layout, progress, colors.primary, layout.compact ? 5 : 5.8);
+          drawOrb(layout, (progress + 0.5) % 1, colors.secondary, layout.compact ? 4.8 : 5.6);
+          drawOrb(layout, (progress + 0.28) % 1, colors.primary, layout.compact ? 3.6 : 4.2);
+          drawEventStack(layout, elapsed);
+
+          if (!reduceMotion.matches) {
+            frame = requestAnimationFrame(draw);
+          }
+        }
+
+        function start() {
+          cancelAnimationFrame(frame);
+          resize();
+          draw(0);
+          if (!reduceMotion.matches) {
+            frame = requestAnimationFrame(draw);
+          }
+        }
+
+        new ResizeObserver(start).observe(stage);
+        reduceMotion.addEventListener("change", start);
+        start();
+        document.fonts?.ready.then(start);
+      }
+    }
+  </script>
+</BaseLayout>

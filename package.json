@@ -1,12 +1,12 @@
 {
-  "name": "tinyloop",
+  "name": "tinyloop-workspace",
   "version": "0.1.0",
   "private": true,
   "description": "A tiny workspace for a minimal tool-using agent loop.",
   "scripts": {
-    "start": "pnpm --filter @tinyloop/tui start",
-    "demo": "pnpm --filter @tinyloop/tui start -- --demo",
-    "build": "pnpm --filter @tinyloop/tui build",
+    "start": "pnpm --filter tinyloop start",
+    "demo": "pnpm --filter tinyloop start -- --demo",
+    "build": "pnpm --filter tinyloop build",
     "check": "biome check . && pnpm -r typecheck",
     "check:fix": "biome check --write .",
     "format": "biome format --write .",
@@ -15,7 +15,7 @@
     "lint:fix": "biome lint --write .",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
-    "pack:check": "pnpm build && pnpm --filter @tinyloop/agent pack --dry-run && pnpm --filter @tinyloop/tui pack --dry-run"
+    "pack:check": "pnpm build && pnpm --filter tinyloop-agent pack --dry-run && pnpm --filter tinyloop pack --dry-run"
   },
   "keywords": [
     "agent",
