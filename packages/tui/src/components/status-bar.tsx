@@ -1,30 +1,29 @@
-import { Text } from "ink";
+import { Box, Text } from "ink";
 import type { TuiState } from "../state/tui-state.js";
+import { colors, statusColor } from "./theme.js";
 
 export type StatusBarProps = {
   mode: "agent" | "demo";
   status: TuiState["status"];
+  turnCount: number;
 };
 
-export function StatusBar({ mode, status }: StatusBarProps) {
+export function StatusBar({ mode, status, turnCount }: StatusBarProps) {
   return (
-    <Text>
-      <Text color="green">tinyloop</Text>
-      <Text dimColor> · </Text>
-      <Text color={mode === "demo" ? "yellow" : "cyan"}>{mode}</Text>
-      <Text dimColor> · status: </Text>
-      <Text color={statusColor(status)}>{status}</Text>
-    </Text>
+    <Box flexDirection="column">
+      <Text>
+        <Text color={colors.text} bold>
+          tinyloop
+        </Text>
+        <Text color={colors.subtle}> </Text>
+        <Text color={mode === "demo" ? colors.warning : colors.accent}>{mode}</Text>
+        <Text color={colors.subtle}> · </Text>
+        <Text color={statusColor(status)}>{status}</Text>
+        <Text color={colors.subtle}> · </Text>
+        <Text color={colors.muted}>{turnCount}</Text>
+        <Text color={colors.subtle}> {turnCount === 1 ? "turn" : "turns"}</Text>
+      </Text>
+      <Text color={colors.rule}>{"─".repeat(72)}</Text>
+    </Box>
   );
-}
-
-function statusColor(status: TuiState["status"]): "green" | "yellow" | "red" {
-  switch (status) {
-    case "idle":
-      return "green";
-    case "running":
-      return "yellow";
-    case "failed":
-      return "red";
-  }
 }

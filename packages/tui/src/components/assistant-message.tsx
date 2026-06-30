@@ -1,6 +1,7 @@
 import { supportsLanguage } from "cli-highlight";
 import { Box, Text } from "ink";
 import SyntaxHighlight from "ink-syntax-highlight";
+import { colors } from "./theme.js";
 
 type AssistantMessageProps = {
   text: string;
@@ -38,7 +39,7 @@ function MarkdownBlockView({ block }: { block: MarkdownBlock }) {
 
   return (
     <Box flexDirection="column" marginY={1}>
-      <Text dimColor>{block.language ? block.language : "code"}</Text>
+      <Text color={colors.subtle}>{block.language ? block.language : "code"}</Text>
       {isDiffLanguage(block.language) ? (
         keyedLines(block.lines, block.id).map(({ key, line }) => <DiffLine line={line} key={key} />)
       ) : (
@@ -53,23 +54,23 @@ function DiffLine({ line }: { line: string }) {
 
   return (
     <Text color={color} dimColor={color === undefined}>
-      {"  "}
+      <Text color={colors.rule}>│ </Text>
       {line.length === 0 ? " " : line}
     </Text>
   );
 }
 
-function diffLineColor(line: string): "cyan" | "green" | "red" | undefined {
+function diffLineColor(line: string): string | undefined {
   if (line.startsWith("+") && !line.startsWith("+++")) {
-    return "green";
+    return colors.success;
   }
 
   if (line.startsWith("-") && !line.startsWith("---")) {
-    return "red";
+    return colors.danger;
   }
 
   if (line.startsWith("@@")) {
-    return "cyan";
+    return colors.accent;
   }
 
   return undefined;

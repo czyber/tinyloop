@@ -1,11 +1,14 @@
 @import "@fontsource-variable/instrument-sans";
 @import "@fontsource/instrument-serif/400.css";
+@import "@fontsource/ibm-plex-serif/400.css";
+@import "@fontsource/ibm-plex-serif/400-italic.css";
+@import "@fontsource/ibm-plex-serif/500.css";
 @import "@fontsource-variable/jetbrains-mono";
-@import "@fontsource-variable/recursive/full.css";
 @import "tailwindcss";
 
 :root {
   color-scheme: light;
+  interpolate-size: allow-keywords;
 
   --color-primary: #0268cf;
   --color-secondary: #e0770d;
@@ -34,9 +37,9 @@
   --font-sans:
     "Instrument Sans Variable", "Instrument Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
-  --font-copy: "Recursive Variable", "Recursive", var(--font-sans);
-  --font-copy-settings: "MONO" 0.24, "CASL" 0.1, "CRSV" 0.42;
-  --font-copy-weight: 380;
+  --font-copy: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  --font-copy-settings: normal;
+  --font-copy-weight: 400;
   --font-mono:
     "JetBrains Mono Variable", "JetBrains Mono", "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono", monospace;
 
@@ -205,15 +208,21 @@ a {
   gap: 0.25rem;
 }
 
+.site-nav-group {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
 .site-nav a {
   position: relative;
   padding: 0.48rem 0.62rem;
   border-radius: var(--radius-control);
   color: var(--color-muted);
-  font-family: var(--font-copy);
+  font-family: var(--font-sans);
   font-size: 0.86rem;
-  font-variation-settings: var(--font-copy-settings);
-  font-weight: var(--font-copy-weight);
+  font-variation-settings: normal;
+  font-weight: 520;
   transition:
     color var(--duration-fast) var(--ease-standard),
     background var(--duration-fast) var(--ease-standard);
@@ -222,6 +231,51 @@ a {
 .site-nav a:hover {
   color: var(--color-ink);
   background: rgb(20 20 20 / 0.055);
+}
+
+.site-subnav {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  display: grid;
+  width: 13.8rem;
+  gap: 0.12rem;
+  padding: 0.35rem;
+  border: 1px solid rgb(216 217 215 / 0.9);
+  border-radius: var(--radius-card);
+  background: rgb(244 244 242 / 0.98);
+  box-shadow: 0 14px 34px rgb(20 20 20 / 0.085);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-0.25rem);
+  transition:
+    opacity var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard),
+    visibility var(--duration-fast) var(--ease-standard);
+  visibility: hidden;
+}
+
+.site-subnav::before {
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  left: 0;
+  height: 0.45rem;
+  content: "";
+}
+
+.site-subnav a {
+  display: block;
+  padding: 0.56rem 0.62rem;
+  white-space: normal;
+}
+
+.site-nav-group:hover .site-subnav,
+.site-nav-group:focus-within .site-subnav {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  visibility: visible;
 }
 
 .mobile-nav-toggle,
@@ -311,10 +365,10 @@ a {
   padding: 0.62rem 0.72rem;
   border-radius: var(--radius-control);
   color: var(--color-muted);
-  font-family: var(--font-copy);
+  font-family: var(--font-sans);
   font-size: 0.9rem;
-  font-variation-settings: var(--font-copy-settings);
-  font-weight: var(--font-copy-weight);
+  font-variation-settings: normal;
+  font-weight: 520;
   transition:
     color var(--duration-fast) var(--ease-standard),
     background var(--duration-fast) var(--ease-standard);
@@ -324,6 +378,12 @@ a {
 .mobile-nav a:focus-visible {
   color: var(--color-ink);
   background: rgb(20 20 20 / 0.055);
+}
+
+.mobile-nav-child {
+  padding-left: 1.35rem;
+  color: rgb(116 118 117 / 0.78);
+  font-size: 0.86rem;
 }
 
 .site-header[data-menu-open="true"] .mobile-nav {
@@ -440,10 +500,10 @@ a {
   width: fit-content;
   padding-block: 0.3rem;
   color: var(--color-muted);
-  font-family: var(--font-copy);
+  font-family: var(--font-sans);
   font-size: 0.92rem;
-  font-variation-settings: var(--font-copy-settings);
-  font-weight: var(--font-copy-weight);
+  font-variation-settings: normal;
+  font-weight: 520;
   transition: color var(--duration-fast) var(--ease-standard);
 }
 
@@ -1420,16 +1480,67 @@ a {
   border-block: 1px solid var(--color-line);
 }
 
-.exercise-steps div {
+.exercise-steps div,
+.exercise-steps details {
   display: grid;
-  grid-template-columns: 7rem minmax(0, 1fr);
-  gap: 1rem;
   padding: 1rem 0;
   border-top: 1px solid var(--color-line);
 }
 
+.exercise-steps div {
+  grid-template-columns: 7rem minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.exercise-steps details:first-child,
 .exercise-steps div:first-child {
   border-top: 0;
+}
+
+.exercise-steps summary {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: start;
+  cursor: pointer;
+  list-style: none;
+}
+
+.exercise-steps details::details-content {
+  block-size: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    block-size 180ms var(--ease-emphasis),
+    opacity 140ms var(--ease-standard),
+    content-visibility 180ms allow-discrete;
+  transition-behavior: allow-discrete;
+}
+
+.exercise-steps details[open]::details-content {
+  block-size: auto;
+  opacity: 1;
+}
+
+.exercise-steps summary::-webkit-details-marker {
+  display: none;
+}
+
+.exercise-steps summary::after {
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  content: "+";
+  transform: translateY(-1px);
+  transition:
+    color var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
+}
+
+.exercise-steps details[open] summary::after {
+  content: "-";
+  transform: translateY(-1px) scaleX(1.12);
 }
 
 .exercise-steps p {
@@ -1440,6 +1551,15 @@ a {
   font-variation-settings: var(--font-copy-settings);
   font-weight: var(--font-copy-weight);
   line-height: 1.62;
+}
+
+.exercise-steps details > p {
+  max-width: 760px;
+  margin-top: 0.65rem;
+  margin-left: 8rem;
+  padding-left: 1rem;
+  border-left: 1px solid var(--color-line);
+  color: var(--color-text);
 }
 
 .anatomy-grid {
@@ -2110,6 +2230,19 @@ a {
   .principle-row,
   .exercise-steps div {
     grid-template-columns: 1fr;
+  }
+
+  .exercise-steps summary {
+    grid-template-columns: 1fr auto;
+    gap: 0.45rem 1rem;
+  }
+
+  .exercise-steps summary span {
+    grid-column: 1 / -1;
+  }
+
+  .exercise-steps details > p {
+    margin-left: 0;
   }
 
   .loop-figure {

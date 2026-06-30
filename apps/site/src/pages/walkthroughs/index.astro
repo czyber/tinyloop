@@ -1,0 +1,56 @@
+---
+import SiteHeader from "../../components/SiteHeader.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="tinyloop walkthroughs - guided agent internals"
+  description="Guided walkthroughs for tinyloop's agent loop and extension points, focused on one idea at a time."
+>
+  <SiteHeader />
+
+  <main>
+    <section class="page-hero page-shell">
+      <p class="eyebrow">Walkthroughs</p>
+      <h1>Follow one agent idea until the boundary becomes visible.</h1>
+      <p>
+        These are guided traces through tinyloop's code. They are not production recipes and they are not generic agent
+        lessons. Each walkthrough keeps one small mechanism in view long enough to make it understandable.
+      </p>
+    </section>
+
+    <section class="section page-shell">
+      <div class="section-header" data-motion>
+        <p class="section-kicker">Start here</p>
+        <h2 class="section-title">Two focused paths through the codebase.</h2>
+        <p class="section-copy">
+          The first follows one user turn from input to rendered transcript. The second adds a tiny read-only tool so you
+          can see the model/tool contract without adding much power.
+        </p>
+      </div>
+
+      <div class="learning-index" data-motion>
+        <article data-motion-child>
+          <span>Trace</span>
+          <h3>One turn, end to end.</h3>
+          <p>
+            Watch a user message become model input, tool execution, session events, reducer state, and terminal output.
+          </p>
+          <a class="button button-secondary" href="/walkthroughs/one-turn/">Open walkthrough</a>
+        </article>
+        <article data-motion-child>
+          <span>Tool</span>
+          <h3>One tiny tool.</h3>
+          <p>
+            Add a small <code>list_files</code> tool and trace the schema, handler, registry entry, and UI event details.
+          </p>
+          <a class="button button-secondary" href="/walkthroughs/one-tiny-tool/">Open walkthrough</a>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer page-shell">
+    <span>Walkthroughs for studying tinyloop without hiding the moving parts.</span>
+  </footer>
+</BaseLayout>

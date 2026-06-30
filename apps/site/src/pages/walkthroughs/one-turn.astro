@@ -1,0 +1,153 @@
+---
+import CodeFrame from "../../components/CodeFrame.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const sessionCode = `async dispatch(command) {
+  const turnId = randomUUID()
+
+  emitForTurn(turnId, { type: "turn.started" })
+  emitForTurn(turnId, { type: "user.message", text: command.text })
+
+  const response = await agent.runOneUserTurn(command.text, { emit })
+
+  emitForTurn(turnId, { type: "assistant.message", text: response })
+  emitForTurn(turnId, { type: "turn.completed" })
+}`;
+
+const agentLoopCode = `for (let turn = 0; turn < maxToolTurns; turn += 1) {
+  response = await createResponse(input)
+  toolCalls = response.output.filter(isToolCall)
+
+  if (toolCalls.length === 0) {
+    return response.output_text
+  }
+
+  input = await runToolCalls(tools, toolCalls, { emit })
+}`;
+
+const reducerCode = `event -> reduceSessionEvent(state, event) -> TuiState
+
+turn.started       creates a running turn
+user.message       appends a user transcript item
+tool.started       appends a running tool item
+tool.progress      appends streamed stdout
+tool.finished      completes the tool item
+assistant.message  appends the final response`;
+---
+
+<BaseLayout
+  title="One turn, end to end - tinyloop walkthrough"
+  description="Trace one tinyloop user turn from AgentSession through the agent loop, tools, events, reducer state, and terminal UI."
+>
+  <SiteHeader />
+
+  <main>
+    <section class="page-hero page-shell">
+      <p class="eyebrow">Walkthrough</p>
+      <h1>One turn, end to end.</h1>
+      <p>
+        A tinyloop turn is not magic. It is a small chain: the session gives the turn an identity, the agent asks the
+        model what to do, tools run only when requested, and the TUI renders from ordered events.
+      </p>
+    </section>
+
+    <section class="section page-shell narrative-section">
+      <div class="section-header" data-motion>
+        <p class="section-kicker">Boundary map</p>
+        <h2 class="section-title">A turn starts as a session concern.</h2>
+        <p class="section-copy">
+          <code>AgentSession.dispatch</code> is where user text becomes an inspectable turn. The session emits lifecycle
+          and transcript events before the agent does any model or tool work.
+        </p>
+      </div>
+
+      <CodeFrame title="packages/agent/src/session.ts" caption="teaching sketch" code={sessionCode} />
+    </section>
+
+    <section class="section page-shell narrative-section">
+      <div class="section-header" data-motion>
+        <p class="section-kicker">Loop</p>
+        <h2 class="section-title">The agent repeats one simple question.</h2>
+        <p class="section-copy">
+          Each model response either contains final text or one or more function calls. If there are function calls,
+          tinyloop runs tools and feeds their outputs into the next model turn.
+        </p>
+      </div>
+
+      <CodeFrame title="packages/agent/src/agent.ts" caption="the core loop shape" code={agentLoopCode} />
+    </section>
+
+    <section class="section page-shell narrative-section">
+      <div class="section-header" data-motion>
+        <p class="section-kicker">Event trace</p>
+        <h2 class="section-title">The hidden work becomes a visible sequence.</h2>
+        <p class="section-copy">
+          This is the key educational move in tinyloop. Tool work is not hidden behind UI components. It crosses the
+          package boundary as ordinary events.
+        </p>
+      </div>
+
+      <ol class="event-sequence" data-motion aria-label="one tinyloop turn event sequence">
+        <li data-motion-child>
+          <span>01</span>
+          <code>turn.started</code>
+          <p>The UI can create a running turn before any model response exists.</p>
+        </li>
+        <li data-motion-child>
+          <span>02</span>
+          <code>user.message</code>
+          <p>The user's text is transcript state, not only model input.</p>
+        </li>
+        <li data-motion-child>
+          <span>03</span>
+          <code>tool.started</code>
+          <p>The normalized TUI event names the tool and keeps the call ID for later updates.</p>
+        </li>
+        <li data-motion-child>
+          <span>04</span>
+          <code>tool.progress</code>
+          <p><code>run_command</code> can stream stdout before the tool is complete.</p>
+        </li>
+        <li data-motion-child>
+          <span>05</span>
+          <code>tool.finished</code>
+          <p>The reducer marks the tool complete and stores details for richer rendering.</p>
+        </li>
+        <li data-motion-child>
+          <span>06</span>
+          <code>assistant.message</code>
+          <p>Final model text becomes another transcript item.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="section page-shell narrative-section">
+      <div class="section-header" data-motion>
+        <p class="section-kicker">Reducer</p>
+        <h2 class="section-title">Rendering is the last step, not the source of truth.</h2>
+        <p class="section-copy">
+          The TUI does not call the agent directly. It reduces events into <code>TuiState</code>, then renders that
+          state. That is why the same components work with the real agent and with demo events.
+        </p>
+      </div>
+
+      <CodeFrame title="packages/tui/src/state/reduce-session-event.ts" caption="event shape becomes UI state" code={reducerCode} />
+    </section>
+
+    <section class="section-compact page-shell">
+      <div class="honesty-note" data-motion>
+        <p class="section-kicker">Takeaway</p>
+        <h2>The turn is the unit of understanding.</h2>
+        <p>
+          If you can trace one turn, you can reason about tools, streaming, failures, and UI updates without needing a
+          bigger agent architecture.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer page-shell">
+    <span>Next: add one small tool and trace how it joins the loop.</span>
+  </footer>
+</BaseLayout>

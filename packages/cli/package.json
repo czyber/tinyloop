@@ -36,6 +36,7 @@
   },
   "scripts": {
     "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "prestart": "pnpm --filter tinyloop-agent build && pnpm --filter tinyloop-tui build",
     "start": "tsx src/main.tsx",
     "test": "pnpm typecheck && tsx test/auth-store.test.ts",
     "build": "pnpm --filter tinyloop-agent build && pnpm --filter tinyloop-tui build && pnpm clean && tsc",

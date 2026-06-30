@@ -1,0 +1,207 @@
+---
+import CodeFrame from "../../components/CodeFrame.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const toolCode = `import { readdir } from "node:fs/promises"
+import type { ToolHandler, ToolResult } from "./registry"
+import { resolveWorkspacePath } from "./registry"
+
+export type ListFilesToolDetails = {
+  path: string
+  entries: string[]
+}
+
+export function createListFilesTool(workspaceRoot: string): ToolHandler<ListFilesToolDetails> {
+  return {
+    definition: {
+      type: "function",
+      name: "list_files",
+      description: "List files in a workspace directory.",
+      parameters: {
+        type: "object",
+        properties: {
+          path: { type: "string", description: "Directory path to list." }
+        },
+        required: ["path"],
+        additionalProperties: false
+      },
+      strict: true
+    },
+    run: async (args): Promise<ToolResult<ListFilesToolDetails>> => {
+      const path = typeof args.path === "string" ? args.path : "."
+      const directory = resolveWorkspacePath(workspaceRoot, path)
+      const entries = await readdir(directory)
+
+      return {
+        output: entries.join("\\n"),
+        details: { path, entries }
+      }
+    }
+  }
+}`;
+
+const registryCode = `const tools = createDefaultTools(workspaceRoot)
+const definitions = toolDefinitions(tools)
+
+await client.responses.create({
+  model,
+  input,
+  tools: definitions
+})
+
+export function createDefaultTools(workspaceRoot: string): ToolMap {
+  return {
+    read_file: createReadFileTool(workspaceRoot),
+    write_file: createWriteFileTool(workspaceRoot),
+    edit_file: createEditFileTool(workspaceRoot),
+    run_command: createRunCommandTool(workspaceRoot),
+    list_files: createListFilesTool(workspaceRoot)
+  }
+}`;
+
+const eventCode = `export type ToolDetailsByName = {
+  read_file: ReadFileToolDetails
+  write_file: WriteFileToolDetails
+  edit_file: EditFileToolDetails
+  run_command: RunCommandLineToolDetails
+  list_files: ListFilesToolDetails
+}`;
+---
+
+<BaseLayout
+  title="One tiny tool - tinyloop walkthrough"
+  description="Add a small read-only tool to tinyloop and trace the model schema, handler, registry, details, and UI events."
+>
+  <SiteHeader />
+
+  <main>
+    <section class="page-hero page-shell">
+      <p class="eyebrow">Walkthrough</p>
+      <h1>One tiny tool.</h1>
+      <p>
+        A good first tool should be boring on purpose. <code>list_files</code> is read-only, easy to test, and still
+        touches every important agent boundary: schema, handler, registry, event details, and UI rendering.
+      </p>
+    </section>
+
+    <section class="section page-shell narrative-section">
+      <div class="section-header" data-motion>
+        <p class="section-kicker">Tool shape</p>
+        <h2 class="section-title">A tool has two audiences.</h2>
+        <p class="section-copy">
+          The model sees a strict JSON schema and receives a string output. The UI can receive structured
+          <code>details</code>. Keeping those separate is one of tinyloop's most useful teaching points.
+        </p>
+      </div>
+
+      <CodeFrame title="packages/agent/src/tools/list-files.ts" caption="small read-only example" code={toolCode} />
+    </section>
+
+    <section class="section page-shell narrative-section">
+      <div class="section-header" data-motion>
+        <p class="section-kicker">Registration</p>
+        <h2 class="section-title">Adding the handler makes the schema visible to the model.</h2>
+        <p class="section-copy">
+          The agent creates the default tool map, turns each tool into a function definition, and passes those
+          definitions to the model request. Once <code>list_files</code> is in <code>createDefaultTools</code>, the model
+          can ask for it by name.
+        </p>
+      </div>
+
+      <CodeFrame title="packages/agent/src/agent.ts + tools/index.ts" caption="how default tools reach the model" code={registryCode} />
+    </section>
+
+    <section class="section page-shell narrative-section">
+      <div class="section-header" data-motion>
+        <p class="section-kicker">Type boundary</p>
+        <h2 class="section-title">Details should become part of the event contract.</h2>
+        <p class="section-copy">
+          If a tool returns structured details, add the detail type to the registry's tool-name map. That keeps
+          <code>tool.execution.finished</code> precise without forcing the model to consume UI-only data.
+        </p>
+      </div>
+
+      <CodeFrame title="packages/agent/src/tools/registry.ts" caption="details by tool name" code={eventCode} />
+    </section>
+
+    <section class="section page-shell narrative-section">
+      <div class="section-header" data-motion>
+        <p class="section-kicker">Trace checklist</p>
+        <h2 class="section-title">Follow the tool through one turn.</h2>
+        <p class="section-copy">
+          The interesting part is not the directory listing. The interesting part is how a capability crosses the model,
+          local runtime, event stream, and renderer without collapsing those boundaries.
+        </p>
+      </div>
+
+      <div class="exercise-steps" data-motion>
+        <details data-motion-child>
+          <summary>
+            <span>schema</span>
+            <p>The model learns that <code>list_files</code> accepts a directory <code>path</code>.</p>
+          </summary>
+          <p>
+            The schema is the only part of the tool the model sees before it decides to call it. Keeping the parameter
+            list small makes the model's choice easy to inspect: it either asks for a path or it does not.
+          </p>
+        </details>
+        <details data-motion-child>
+          <summary>
+            <span>handler</span>
+            <p>The local runtime resolves the path inside the workspace and reads directory entries.</p>
+          </summary>
+          <p>
+            The handler is ordinary TypeScript running on the user's machine. <code>resolveWorkspacePath</code> keeps the
+            path inside the workspace, which makes the safety boundary visible without introducing a full sandbox.
+          </p>
+        </details>
+        <details data-motion-child>
+          <summary>
+            <span>output</span>
+            <p>The model receives a plain newline-separated string it can reason over.</p>
+          </summary>
+          <p>
+            Tool output should be boring and model-readable. A newline-separated list is enough for the next model turn
+            to summarize, choose a file, or ask for another tool.
+          </p>
+        </details>
+        <details data-motion-child>
+          <summary>
+            <span>details</span>
+            <p>The UI receives structured entries if it wants a cleaner rendering later.</p>
+          </summary>
+          <p>
+            Details are not for the model. They let the TUI render richer information without changing the text the
+            model reasons over. That separation keeps the tool useful without making its prompt contract messy.
+          </p>
+        </details>
+        <details data-motion-child>
+          <summary>
+            <span>event</span>
+            <p>The session emits <code>tool.execution.finished</code> with the same call ID that started the tool.</p>
+          </summary>
+          <p>
+            The call ID is the thread that ties start, progress, and finish events together. The reducer can update the
+            right tool row even when a turn contains more than one tool call.
+          </p>
+        </details>
+      </div>
+    </section>
+
+    <section class="section-compact page-shell">
+      <div class="honesty-note" data-motion>
+        <p class="section-kicker">Taste</p>
+        <h2>Keep the first tool intentionally small.</h2>
+        <p>
+          <code>list_files</code> deepens the project because it makes the contract easier to see. A smarter search tool
+          or project index would be useful, but it would teach several extra ideas at once.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer page-shell">
+    <span>A tiny tool is enough to expose the full model/tool/event boundary.</span>
+  </footer>
+</BaseLayout>

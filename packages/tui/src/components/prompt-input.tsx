@@ -2,6 +2,7 @@ import { Box, Text } from "ink";
 import Spinner from "ink-spinner";
 import TextInput from "ink-text-input";
 import { useState } from "react";
+import { colors } from "./theme.js";
 
 export type PromptInputProps = {
   disabled: boolean;
@@ -15,14 +16,15 @@ export function PromptInput({ disabled, onSubmit }: PromptInputProps) {
     <Box>
       {disabled ? (
         <>
-          <Text color="yellow">
+          <Text color={colors.warning}>
             <Spinner type="dots" />
           </Text>
-          <Text dimColor> working...</Text>
+          <Text color={colors.muted}> running</Text>
         </>
       ) : (
         <>
-          <Text color="cyan">{"> "}</Text>
+          <Text color={colors.muted}>you</Text>
+          <Text color={colors.subtle}> › </Text>
           <TextInput
             focus={!disabled}
             highlightPastedText
@@ -36,11 +38,10 @@ export function PromptInput({ disabled, onSubmit }: PromptInputProps) {
               setValue("");
               void onSubmit(trimmedValue);
             }}
-            placeholder="Ask tinyloop..."
+            placeholder="Message tinyloop"
             showCursor
             value={value}
           />
-          <Text dimColor> Enter to send</Text>
         </>
       )}
     </Box>

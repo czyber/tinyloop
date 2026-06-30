@@ -4,7 +4,6 @@ import type { SessionDriver } from "../session/session-driver.js";
 import { reduceSessionEvent } from "../state/reduce-session-event.js";
 import { initialTuiState } from "../state/tui-state.js";
 import { PromptInput } from "./prompt-input.js";
-import { Separator } from "./separator.js";
 import { StatusBar } from "./status-bar.js";
 import { Transcript } from "./transcript.js";
 
@@ -37,13 +36,11 @@ export function App({ mode, sessionDriver }: AppProps) {
   }, [sessionDriver]);
 
   return (
-    <Box flexDirection="column">
-      <StatusBar mode={mode} status={state.status} />
-      <Separator />
-      <Box flexDirection="column" marginY={1}>
+    <Box flexDirection="column" paddingX={1}>
+      <StatusBar mode={mode} status={state.status} turnCount={state.turns.length} />
+      <Box flexDirection="column" marginY={1} minHeight={1}>
         <Transcript turns={state.turns} />
       </Box>
-      <Separator />
       <PromptInput disabled={state.status === "running"} onSubmit={(text) => sessionDriver.sendUserMessage(text)} />
     </Box>
   );

@@ -15,7 +15,7 @@
     "@astrojs/mdx": "^7.0.0",
     "@fontsource-variable/instrument-sans": "^5.2.8",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
-    "@fontsource-variable/recursive": "^5.2.8",
+    "@fontsource/ibm-plex-serif": "^5.2.7",
     "@fontsource/instrument-serif": "^5.2.8",
     "@lucide/astro": "^1.22.0",
     "@tailwindcss/vite": "^4.3.1",
